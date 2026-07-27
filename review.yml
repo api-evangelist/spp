@@ -1,0 +1,408 @@
+aid: spp
+name: Southwest Power Pool
+review:
+  question: >-
+    Does Southwest Power Pool publish a public API surface, and does any energy
+    data mandate apply to it — and if so, is it implemented?
+  answer: partial
+  date: '2026-07-27'
+  reviewer: API Evangelist
+  homeMarket: United States
+  tier: system-operator
+mandate:
+  regime: other
+  regimeDetail: >-
+    No consumer energy-data right applies to SPP. Green Button (NAESB REQ.21 /
+    ESPI) is a retail-utility standard for individual customer usage data; SPP is
+    a wholesale Regional Transmission Organization with no retail customers, so
+    Green Button — voluntary or otherwise — is not applicable. The Australian
+    Consumer Data Right (energy) and the Ontario Green Button regulation are
+    foreign regimes and do not reach SPP. The only regulatory obligation found
+    that directly shapes an SPP API is FERC Order 881, which requires
+    ambient-adjusted transmission line ratings to be exchanged between
+    transmission owners and grid operators; SPP also operates under FERC's
+    general market-transparency requirements for RTO price and market data.
+  status: live-claimed-unverified
+  statusEvidence: >-
+    SPP published the "SPP LEP/TROLIE API Data Exchange Guide" v1.0 dated
+    2024-11-08 (HTTP 200, 1,069,254 bytes, fetched 2026-07-27), a real versioned
+    specification document describing its implementation of GE Vernova's Limit
+    Exchange Portal against the LF Energy TROLIE OpenAPI specification, with
+    concrete request/response examples for monitoring sets, forecast ratings,
+    real-time ratings and seasonal ratings. That is a published implementation
+    guide, NOT a verified live endpoint. SPP's own guide writes every example
+    against the placeholder host "https://<baseURL>/lep-operations/..." — no
+    production hostname is published anywhere public. Probes of api.spp.org,
+    developer.spp.org, developers.spp.org, docs.spp.org and data.spp.org all
+    failed to resolve (curl exit status 000). Authentication requires an x.509
+    digital certificate from a CA SPP trusts plus a role assigned in SPP UAA, so
+    the surface cannot be reached or conformance-checked anonymously. Recorded as
+    live-claimed-unverified: the obligation is real, the implementation is
+    documented, the running endpoint was not observed.
+  notApplicable:
+  - regime: green-button-voluntary
+    reason: SPP has no retail customers; Green Button/ESPI is a retail utility standard.
+  - regime: cdr-energy
+    reason: Australian regime; SPP is a US RTO.
+  - regime: green-button-ontario
+    reason: Ontario regulation; SPP operates in the United States.
+  - regime: smart-meter-infrastructure
+    reason: >-
+      No UK DCC-style metering infrastructure mandate applies. SPP receives
+      telemetry from members over ICCP and AGC (TCP/IP), not from a mandated
+      smart-meter data hub.
+dataStandard:
+  primary: >-
+    LF Energy TROLIE (Transmission Ratings and Operating Limits Information
+    Exchange), OpenAPI 3.0.3, spec version 1.1.0 — implemented by SPP's LEP
+    ratings API per SPP's own data exchange guide.
+  others:
+  - ICCP (IEC 60870-6/TASE.2) for control-centre to control-centre telemetry, named
+    in the SPP System Interfaces Stakeholder Reference Guide.
+  - IEEE C37.118 PMU streaming over TCP/IP, named in the same guide (PMU Communication Handbook).
+  - Esri ArcGIS REST API for the price contour map geospatial services.
+  - Proprietary SPP SOAP WSDL/XSD contracts for Integrated Marketplace, WEIS and
+    Settlement Management System web services.
+  notFound:
+  - Green Button / ESPI — no reference found anywhere on spp.org.
+  - IEC CIM 61968/61970 — no public reference found in SPP stakeholder documentation.
+  - OpenADR, IEEE 2030.5, OCPP, OCPI — not applicable to a wholesale market operator; none found.
+  publicMarketData: >-
+    No standard reference found. SPP's public market data is delivered as bare CSV
+    files with SPP-defined column headers, documented in the SPP Markets Public
+    Data Guide, not against any industry data model.
+dataSplit:
+  consumerDataApi: false
+  consumerDataNote: >-
+    SPP has no consumer-facing data surface at all. It is a wholesale market
+    operator; individual customer usage and billing data lives with the member
+    load-serving entities and their state regulators, never with SPP. There is no
+    consent framework, no accreditation scheme and no third-party customer-data
+    API to find.
+  marketDataOpen: true
+  marketDataNote: >-
+    Genuinely open, anonymous, no account, no key, no licence click-through.
+    Verified by direct probe on 2026-07-27.
+  verifiedOpenEndpoints:
+  - url: ftp://pubftp.spp.org/
+    status: 226
+    note: >-
+      Anonymous FTP listing succeeded. Directories returned included Markets,
+      Operational_Data, Operations_Reports, Settlements, Reliability, TCR,
+      Market_Monitoring, Modeling_Reports, Engineering, West_EIS, MISO_LMP_DATA.
+      This is the interface SPP itself documents as programmatic public data access.
+  - url: https://portal.spp.org/file-browser-api/download/rtbm-lmp-by-location?path=/RTBM-LMP-SL-latestInterval.csv
+    status: 200
+    contentType: text/csv
+    bytes: 174381
+    note: Real-time balancing market LMP by settlement location, latest interval.
+  - url: https://portal.spp.org/file-browser-api/download/rtbm-mcp?path=/RTBM-MCP-latestInterval.csv
+    status: 200
+    contentType: text/csv
+    bytes: 1002
+    note: Real-time market clearing prices by reserve zone; live 2026-07-27 intervals observed.
+  - url: https://portal.spp.org/file-browser-api/download/da-mcp?path=/2026/07/DA-MCP-202607250100.csv
+    status: 200
+    contentType: text/csv
+    bytes: 18109
+    note: Day-ahead market clearing prices.
+  - url: https://portal.spp.org/file-browser-api/download/operating-reserves?path=/RTBM-OR-latestInterval.csv
+    status: 200
+    contentType: text/csv
+    bytes: 1046
+  - url: https://portal.spp.org/file-browser-api/download/hourly-load?path=/2025/DAILY_HOURLY_LOAD-20250101.csv
+    status: 200
+    contentType: text/csv
+    bytes: 4071
+  - url: https://portal.spp.org/file-browser-api/download/generation-mix-historical?path=/SPP/GenMixYTD_SPP.csv
+    status: 200
+    contentType: text/csv
+    bytes: 9561130
+  - url: https://portal.spp.org/file-browser-api/download/ver-curtailments?path=/2026/07/VER-Curtailments-20260725.csv
+    status: 200
+    contentType: text/csv
+    bytes: 55516
+  - url: https://portal.spp.org/file-browser-api/download/capacity-of-generation-on-outage?path=/2026/07/Capacity-Gen-Outage-20260725.csv
+    status: 200
+    contentType: text/csv
+    bytes: 54011
+  - url: https://portal.spp.org/file-browser-api/download/lmp-by-settlement-location-weis?path=/WEIS-RTBM-LMP-SL-latestInterval.csv
+    status: 200
+    contentType: text/csv
+    bytes: 37153
+    note: Western Energy Imbalance Service market LMP.
+  - url: https://portal.spp.org/chart-api/gen-mix/asChart
+    status: 200
+    contentType: application/json
+    bytes: 4209
+    note: >-
+      JSON payload with pieLabels Coal, Diesel Fuel Oil, Hydro, Natural Gas,
+      Nuclear, Solar, Waste Disposal Services, Wind, Waste Heat, Other and 24
+      hourly MW values per fuel.
+  - url: https://portal.spp.org/chart-api/load-forecast/asChart
+    status: 200
+    contentType: application/json
+    bytes: 44153
+  - url: https://portal.spp.org/chart-api/gen-mix-365/asFile
+    status: 200
+    contentType: text/csv
+    bytes: 16823718
+  - url: https://pricecontourmap.spp.org/arcgis/rest/services?f=json
+    status: 200
+    contentType: application/json
+    note: 'ArcGIS 11.5 service directory; folders PCM and Utilities.'
+  - url: https://pricecontourmap.spp.org/arcgis/rest/services/PCM?f=json
+    status: 200
+    contentType: application/json
+    note: >-
+      Listed MapServer services DA_Features, DA_LMP, DELTA_Features, DELTA_LMP,
+      RTBM_Features, RTBM_LMP, States, Transmission.
+accessGate:
+  publicTier: self-serve
+  publicTierDetail: >-
+    For the open market-data surface there is effectively no gate at all. A
+    developer opens https://portal.spp.org, navigates to a data page, and can hit
+    the underlying file-browser-api or chart-api URL directly, or connect to
+    ftp://pubftp.spp.org anonymously. No registration, no API key, no rate-limit
+    documentation, no terms acceptance step is enforced in the request path.
+  participantTier: partner-only
+  participantTierDetail: >-
+    For anything a market participant transacts against, the gate is membership.
+    A developer must (1) have their organization registered with SPP as a member,
+    market participant, transmission owner/operator or other stakeholder, (2)
+    obtain an OATI webCARES x.509 digital certificate — SPP's Digital Certificates
+    and the Integrated Marketplace document states OATI is the only Certificate
+    Authority trusted by Integrated Marketplace applications, (3) have a Local
+    Security Administrator assign the user roles and scope in SPP UAA, and (4)
+    open an RMS ticket (https://rms.spp.org/, HTTP 200) to request access and, for
+    some documents such as the AGC Integration Guide and ICCP Handbook, to request
+    the password that unlocks the specification itself. The WSDLs, XSDs and
+    endpoint URLs live in the member-facing Change User Forum technical reference
+    documents.
+  overall: self-serve
+  overallNote: >-
+    Recorded as self-serve because the surface a developer can actually reach and
+    build on is completely ungated. The gated tier is real but is a membership
+    relationship, not a developer onboarding funnel.
+authModel:
+  publicData: >-
+    None. Anonymous HTTP GET and anonymous FTP. No key, no token, no cookie
+    required for any confirmed open endpoint.
+  participantApis: >-
+    Two-factor: an x.509 client certificate issued by a CA SPP trusts (OATI
+    webCARES for Integrated Marketplace) presented over mTLS, plus an SPP UAA
+    identity whose roles and scope authorize the specific API function. SPP's
+    System Interfaces Stakeholder Reference Guide states most programmatic
+    services require two-factor authentication. The LEP/TROLIE guide describes
+    UAA authenticating the certificate then looking up the user's roles and scope
+    per connection.
+  openidConnect:
+    probed: true
+    result: >-
+      https://portal.spp.org/.well-known/openid-configuration returned HTTP 200
+      but with content-type text/html and 609 bytes — the React SPA index shell,
+      not a discovery document. https://www.spp.org/.well-known/openid-configuration
+      returned HTTP 404. No OpenID Connect discovery document is served.
+  oauthInSpec: >-
+    The TROLIE standard spec declares one security scheme, oauth2-primary-flow.
+    That is the standard's scheme, not evidence of an SPP-hosted OAuth server.
+developerPortal:
+  url: https://www.spp.org/stakeholder-center/user-guides-apis-integrations/
+  status: 200
+  confirmed: false
+  note: >-
+    SPP has no developer portal in the ordinary sense. The closest thing is the
+    "User Guides, APIs & Integrations" stakeholder-centre page, which is a landing
+    hub that links to PDF reference guides rather than a signup-and-build surface.
+    https://portal.spp.org is the SPP Portal — part public data browser, part
+    member application login — not a developer portal. Marked confirmed:false
+    because no self-serve developer registration, key issuance, interactive
+    reference or sandbox exists.
+specHarvest:
+  openapiFound: true
+  sppAuthoredSpecs: 0
+  sppAuthoredNote: >-
+    SPP publishes no OpenAPI, Swagger, AsyncAPI, GraphQL schema or Postman
+    collection of its own. Probes of https://portal.spp.org/openapi.json,
+    /swagger.json, /v3/api-docs and /api-docs all returned the 609-byte SPA index
+    shell (HTTP 200, text/html) or HTTP 404 — none is a specification. SPP's
+    machine-readable contracts for member APIs are SOAP WSDL/XSD files distributed
+    inside the member-only Change User Forum.
+  harvested:
+  - file: openapi/trolie-standard-openapi.yml
+    sourceUrl: https://trolie.energy/openapi-1.0.yaml
+    httpStatus: 200
+    contentType: text/yaml
+    bytes: 338771
+    fetchDate: '2026-07-27'
+    parses: true
+    openapiVersion: 3.0.3
+    title: Transmission Ratings and Operating Limits Information Exchange (TROLIE)
+    specVersion: 1.1.0
+    pathCount: 16
+    provenance: >-
+      IMPORTANT — this specification is NOT authored or published by Southwest
+      Power Pool. It is the LF Energy TROLIE community specification, published at
+      trolie.energy and developed in github.com/trolie/spec. It is stored here
+      because SPP's own "SPP LEP/TROLIE API Data Exchange Guide" v1.0 explicitly
+      directs implementers to it as the contract for SPP's LEP ratings API, and
+      because SPP publishes no contract of its own. Servers block declares the
+      placeholder https://trolie.example.com, which is the standard's example host,
+      not an SPP host.
+    paths:
+    - GET /limits/forecast-snapshot
+    - GET /limits/forecast-snapshot/{period}
+    - GET|POST /limits/regional/forecast-snapshot
+    - GET|POST /rating-proposals/realtime
+    - GET /limits/realtime-snapshot
+    - GET /limits/regional/realtime-snapshot
+    - GET|PATCH /rating-proposals/forecast
+    - GET /seasonal-ratings/snapshot
+    - GET|PATCH /rating-proposals/seasonal
+    - GET|POST /seasonal-overrides
+    - GET|PUT|DELETE /seasonal-overrides/{id}
+    - GET|POST /temporary-aar-exceptions
+    - GET|PUT|DELETE /temporary-aar-exceptions/{id}
+    - POST /monitoring-sets
+    - GET|PUT|DELETE /monitoring-sets/{id}
+    - GET /default-monitoring-set
+probes:
+- url: https://spp.org/
+  status: 200
+- url: https://www.spp.org/about-us/
+  status: 200
+- url: https://www.spp.org/stakeholder-center/user-guides-apis-integrations/
+  status: 200
+- url: https://www.spp.org/marketsplus
+  status: 200
+  note: >-
+    Markets+ is in Phase Two implementation with a targeted October 2027 go-live.
+    SPP states Markets+ will use RESTful APIs rather than the SOAP services used by
+    existing markets. No Markets+ API specification or developer documentation is
+    public as of 2026-07-27.
+- url: https://portal.spp.org/
+  status: 200
+  note: React single-page app; marketplace.spp.org 302-redirects here.
+- url: https://marketplace.spp.org/
+  status: 302
+  note: Redirects to https://portal.spp.org/
+- url: https://opsportal.spp.org/
+  status: 200
+- url: https://rms.spp.org/
+  status: 200
+  note: Request Management System — the ticketing front door for access requests.
+- url: https://api.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://developer.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://developers.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://docs.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://data.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://opendata.spp.org/
+  status: 000
+  note: Does not resolve.
+- url: https://webservices.spp.org/
+  status: 000
+- url: https://webservices.marketplace.spp.org/
+  status: 000
+- url: https://api.marketplace.spp.org/
+  status: 000
+- url: https://portal.spp.org/openapi.json
+  status: 200
+  note: 609-byte SPA index.html, not a specification.
+- url: https://portal.spp.org/swagger.json
+  status: 200
+  note: 609-byte SPA index.html, not a specification.
+- url: https://portal.spp.org/v3/api-docs
+  status: 200
+  note: 609-byte SPA index.html, not a specification.
+- url: https://marketplace.spp.org/api-docs
+  status: 404
+- url: https://portal.spp.org/.well-known/openid-configuration
+  status: 200
+  note: 609-byte SPA index.html, not a discovery document.
+- url: https://www.spp.org/.well-known/openid-configuration
+  status: 404
+- url: https://www.spp.org/robots.txt
+  status: 404
+- url: https://www.spp.org/sitemap.xml
+  status: 404
+- url: https://www.spp.org/feed/
+  status: 404
+  note: No RSS feed found at the conventional path.
+- url: https://github.com/SouthwestPowerPool
+  status: 404
+  note: No SPP GitHub organization found.
+sources:
+- url: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  type: Documentation
+  status: 200
+  note: >-
+    SPP Public Data Access v3.0, July 2023. States plainly "Programmatic (API)
+    access to public data is via FTP" with production ftp://pubftp.spp.org and MTE
+    ftp://pubftp-mte.itespp.org. UI access is https://portal.spp.org.
+- url: https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
+  type: Documentation
+  status: 200
+  note: >-
+    System Interfaces Stakeholder Reference Guide v1.0, 2025-01-29. Inventories
+    every stakeholder interface and its type — Market System (UI, API), Settlement
+    Management System (UI, API), Credit Management System (UI, API), CROW outage
+    management (UI, API), TCR Market (UI, API), Schedule Data (API only), Public
+    Data/EADS (FTP), AGC/ICCP/PMU (TCP/IP). States "SPP utilizes SOAP and REST-based
+    web services over HTTPS... Most of these services require two-factor
+    authentication" and that documentation lives in the Change User Forum technical
+    reference documents.
+- url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  type: Documentation
+  status: 200
+  note: >-
+    SPP LEP/TROLIE API Data Exchange Guide v1.0, 2024-11-08. Cites FERC Order 881 as
+    the driver, points implementers at https://trolie.energy/spec and
+    https://github.com/TROLIE/spec, and documents digital-certificate plus UAA
+    role-based authorization. All examples use the placeholder host https://<baseURL>.
+- url: https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
+  type: Documentation
+  note: Digital Certificates and the Integrated Marketplace — OATI webCARES CA requirement.
+- url: https://www.spp.org/documents/19541/spp%20markets%20public%20data%20guide.pdf
+  type: Documentation
+  note: SPP Marketplace Public Data file formats for RTBM, DA and TCR market data.
+- url: https://trolie.energy/openapi-1.0.yaml
+  type: OpenAPI
+  status: 200
+  note: Source of openapi/trolie-standard-openapi.yml. LF Energy project, not SPP.
+findings:
+  summary: >-
+    Southwest Power Pool is the clearest possible illustration of the
+    consumer-versus-market split in energy. On the market side SPP is one of the
+    most open data publishers in the sector: real-time and day-ahead LMPs, market
+    clearing prices, operating reserves, load, forecast, generation mix, VER
+    curtailments and outage capacity are all reachable with a bare anonymous GET or
+    an anonymous FTP session, plus an ArcGIS REST geospatial service for the price
+    contour map. On the consumer side there is nothing, correctly — SPP is a
+    wholesale operator with no retail customers, so no Green Button, no CDR-style
+    consumer data right and no consent framework applies. The mandate that does
+    touch SPP is FERC Order 881, and SPP's response is genuinely interesting: it
+    adopted the LF Energy TROLIE OpenAPI specification rather than inventing a
+    proprietary contract, and published a real versioned data exchange guide for it.
+    But SPP itself publishes no OpenAPI, no base URL and no developer portal for
+    that API, so the implementation could only be recorded as claimed, not verified.
+    The participant tier as a whole is still SOAP over mTLS with OATI certificates
+    and RMS tickets; the promised move to REST arrives with Markets+ in 2027.
+  openSurfaceQuality: >-
+    High coverage, low API maturity. The data is excellent and free, but it is
+    delivered as dated CSV file paths a consumer must construct by convention, with
+    no listing endpoint (/file-browser-api/ itself returns 404), no OpenAPI, no
+    documented rate limits, no versioning policy and no formal support commitment —
+    SPP's own reference guide warns that "any access or exchange of data outside of
+    officially published SPP interface specifications is neither supported nor
+    encouraged," which describes the HTTP file-browser-api path most third-party
+    tools actually use.
