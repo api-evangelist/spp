@@ -1,0 +1,54 @@
+generated: '2026-07-27'
+method: searched
+source: live anonymous requests to SPP hosts on 2026-07-27
+note: >-
+  Real, unedited responses captured from SPP's anonymous surfaces. SPP publishes
+  no examples, no code samples and no specification for these endpoints, so these
+  captures are the only concrete payload shapes available. Each entry records the
+  exact request URL, HTTP status, content type and byte count at capture time.
+  Live values change every five minutes; these are point-in-time samples, not a
+  contract.
+examples:
+- file: spp-rtbm-mcp-latest-interval.csv
+  url: https://portal.spp.org/file-browser-api/download/rtbm-mcp?path=/RTBM-MCP-latestInterval.csv
+  status: 200
+  content_type: text/csv
+  bytes: 1002
+  api: spp:spp-portal-file-browser-api
+  description: >-
+    Real-time balancing market clearing prices by reserve zone, latest 5-minute
+    interval. Header row Interval, GMTIntervalEnd, Reserve Zone, RegUPService,
+    RegDNService, RegUpMile, RegDNMile, RampUP, RampDN, Spin, Supp, UncUP, BAA.
+- file: spp-chart-api-gen-mix.json
+  url: https://portal.spp.org/chart-api/gen-mix/asChart
+  status: 200
+  content_type: application/json
+  bytes: 4352
+  api: spp:spp-portal-chart-api
+  description: >-
+    Generation-mix chart feed: pie labels per fuel type (Coal, Diesel Fuel Oil,
+    Hydro, Natural Gas, Nuclear, Solar, Waste Disposal Services, Wind, Waste
+    Heat, Other) with hourly MW series.
+- file: spp-arcgis-rest-info.json
+  url: https://pricecontourmap.spp.org/arcgis/rest/info?f=json
+  status: 200
+  content_type: application/json; charset=UTF-8
+  bytes: 265
+  api: spp:spp-price-contour-map-arcgis
+  description: >-
+    ArcGIS Server info document. currentVersion 11.5, fullVersion 11.5.0,
+    soapUrl https://pricecontourmap.spp.org/arcgis/services, authInfo
+    isTokenBasedSecurity true with tokenServicesUrl
+    https://pricecontourmap.spp.org/arcgis/tokens/. This is the evidence behind
+    the arcgis-token scheme in authentication/spp-authentication.yml.
+- file: spp-arcgis-rtbm-lmp-mapserver.json
+  url: https://pricecontourmap.spp.org/arcgis/rest/services/PCM/RTBM_LMP/MapServer?f=json
+  status: 200
+  content_type: application/json; charset=UTF-8
+  bytes: 3186
+  api: spp:spp-price-contour-map-arcgis
+  description: >-
+    MapServer service description for the real-time balancing market LMP price
+    contours, self-described as updating every five minutes; carries the layer,
+    spatial-reference and capability metadata for the geospatial projection of
+    the same price data served as CSV.

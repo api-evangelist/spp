@@ -1,0 +1,163 @@
+generated: '2026-07-27'
+method: derived
+source:
+- openapi/trolie-standard-openapi.yml
+- live column headers fetched from portal.spp.org/file-browser-api on 2026-07-27
+docs: https://www.spp.org/documents/19541/spp%20markets%20public%20data%20guide.pdf
+note: >-
+  Two disconnected data models. The ratings-exchange model is derived from the
+  109 component schemas of the LF Energy TROLIE 1.1.0 specification that SPP's
+  LEP/TROLIE Data Exchange Guide adopts. The public market-data model is derived
+  from the actual CSV column headers returned by SPP's anonymous file-browser
+  download paths on 2026-07-27 — SPP publishes no schema, JSON Schema or data
+  dictionary for these files beyond the prose Markets Public Data Guide, so the
+  field lists below are the observed header rows, not a published contract.
+domains:
+- name: ratings-exchange
+  source: openapi/trolie-standard-openapi.yml
+  standard: LF Energy TROLIE 1.1.0
+  key_concepts:
+  - Ratings Provider proposes ratings for the power system resources in its Ratings Obligation
+  - Clearinghouse Provider (SPP, as Transmission Provider and Reliability Coordinator) turns proposed ratings into operating limits
+  - a Monitoring Set scopes which power system limits a provider cares about
+  entities:
+  - name: monitoring-set
+    identifier: id (path parameter)
+    operations: [createMonitoringSet, getMonitoringSet, updateMonitoringSet, deleteMonitoringSet, getDefaultMonitoringSet]
+    schemas: [request, response, response_v2]
+    relationships:
+    - {type: has_many, target: named-power-system-resources, via: power-system-resources}
+  - name: forecast-rating-proposal
+    operations: [patchRatingForecastProposal, getRatingForecastProposalStatus]
+    schemas: [forecast-proposal, forecast-proposal-slim, forecast-proposal-status]
+    relationships:
+    - {type: has_one, target: forecast-proposal-header, via: header}
+    - {type: has_many, target: resource-forecast-proposal, via: ratings}
+    - {type: has_many, target: resource-forecast-inputs, via: inputs-used}
+  - name: forecast-limits-snapshot
+    operations: [getLimitsForecastSnapshot, getHistoricalLimitsForecastSnapshot, getRegionalLimitsForecastSnapshot, postRegionalLimitsForecastSnapshot]
+    schemas: [forecast-limits-snapshot, forecast-limits-snapshot-slim, forecast-limits-detailed-snapshot]
+    relationships:
+    - {type: has_one, target: forecast-snapshot-header, via: snapshot-header}
+    - {type: has_many, target: forecast-limit-item, via: limits}
+    - {type: has_many, target: proposals-considered, via: proposals-considered}
+    - {type: has_many, target: temporary-aar-exceptions, via: temporary-aar-exceptions}
+    - {type: has_many, target: overrides, via: overrides}
+  - name: real-time-rating-proposal
+    operations: [postRealTimeProposal, getRealTimeProposalStatus]
+    schemas: [realtime-proposal, realtime-proposal-slim, real-time-proposal-status]
+    relationships:
+    - {type: has_one, target: real-time-proposal-header, via: header}
+    - {type: has_many, target: resource-forecast-inputs, via: inputs-used}
+  - name: real-time-limits-snapshot
+    operations: [getRealTimeLimits, getRegionalRealTimeLimits]
+    schemas: [realtime-limits-snapshot, realtime-limits-snapshot-slim, realtime-limits-detailed-snapshot]
+    relationships:
+    - {type: has_one, target: real-time-snapshot-header, via: snapshot-header}
+    - {type: has_many, target: realtime-snapshot, via: ratings}
+    - {type: has_many, target: real-time-provenance, via: provenance}
+  - name: seasonal-ratings-proposal
+    operations: [patchSeasonalRatingsProposal, getSeasonalRatingProposalStatus]
+    schemas: [seasonal-ratings-proposal, seasonal-ratings-proposal-slim, seasonal-ratings-proposal-status]
+    relationships:
+    - {type: has_one, target: seasonal-proposal-header, via: header}
+    - {type: has_many, target: seasonal-proposals, via: ratings}
+    - {type: has_many, target: missing-seasonal-obligation, via: missing-obligations}
+  - name: seasonal-ratings-snapshot
+    operations: [getSeasonalRatingsSnapshot]
+    schemas: [seasonal-ratings-snapshot, seasonal-ratings-snapshot-detailed]
+    relationships:
+    - {type: has_one, target: common-header, via: snapshot-header}
+    - {type: has_many, target: seasonal-rating-snapshot-item, via: ratings}
+  - name: seasonal-override
+    identifier: id (path parameter)
+    operations: [getSeasonalOverrides, createSeasonalOverride, getSeasonalOverride, updateSeasonalOverride, deleteSeasonalOverride]
+    schemas: [seasonal-override, seasonal-override-set, seasonal-override-request]
+    relationships:
+    - {type: has_one, target: limit-value-set, via: limits}
+    - {type: has_one, target: data-provenance, via: provenance}
+    - {type: has_one, target: day-night, via: day-night}
+  - name: temporary-aar-exception
+    identifier: id (path parameter)
+    operations: [getTemporaryAARExceptions, createTemporaryAARException, getTemporaryAARException, updateTemporaryAARException, deleteTemporaryAARException]
+    schemas: [temporary-aar-exception, temporary-aar-exception-set, temporary-aar-exception-request]
+    relationships:
+    - {type: has_one, target: limit-value-set, via: limits}
+    - {type: has_one, target: data-provenance, via: provenance}
+    - {type: belongs_to, target: named-power-system-resources, via: resource-id}
+  shared_value_types:
+  - {name: limit, note: the operating limit a clearinghouse determines}
+  - {name: limit-value-set, note: continuous plus emergency-duration limit values}
+  - {name: active-power / apparent-power / current / reactive-power, note: typed limit units}
+  - {name: overvoltage-threshold / undervoltage-threshold, note: voltage thresholds, absolute and per-unit}
+  - {name: data-provenance, note: who supplied the value and when}
+  - {name: resource-id / names / entity, note: power system resource identity}
+  - {name: period-start / timestamp, note: temporal keys on every snapshot and proposal}
+- name: public-market-data
+  source: probe
+  base_url: https://portal.spp.org/file-browser-api/download
+  note: >-
+    Each dataset is a CSV file addressed by dataset slug plus a path query
+    parameter. Latest-interval files are stable paths; historical files are
+    addressed by date-partitioned convention (/YYYY/MM/NAME-YYYYMMDD.csv). There
+    is no listing endpoint — /file-browser-api/ itself returns HTTP 404 — so a
+    consumer must construct paths by convention.
+  datasets:
+  - slug: rtbm-lmp-by-location
+    grain: 5-minute interval x settlement location
+    fields: [Interval, GMTIntervalEnd, Settlement Location, Pnode, LMP, MLC, MCC, MEC, BAA]
+    example_path: /RTBM-LMP-SL-latestInterval.csv
+  - slug: rtbm-mcp
+    grain: 5-minute interval x reserve zone
+    fields: [Interval, GMTIntervalEnd, Reserve Zone, RegUPService, RegDNService, RegUpMile, RegDNMile, RampUP, RampDN, Spin, Supp, UncUP, BAA]
+    example_path: /RTBM-MCP-latestInterval.csv
+    example_file: examples/spp-rtbm-mcp-latest-interval.csv
+  - slug: da-mcp
+    grain: hourly x reserve zone
+    example_path: /2026/07/DA-MCP-202607250100.csv
+  - slug: operating-reserves
+    grain: 5-minute interval x reserve zone
+    fields: [Interval, GMTIntervalEnd, Reserve Zone, RegUP_Clr, RegDN_Clr, RampUP_Clr, RampDN_Clr, UncUP_Clr, STSUncUP_Clr, Spin_Clr, Supp_Clr, BAA]
+    example_path: /RTBM-OR-latestInterval.csv
+  - slug: hourly-load
+    grain: hourly x load-serving entity
+    fields: [MarketHour, CSWS, EDE, GRDA, INDN, KACY, KCPL, LES, MPS, NPPD, OKGE, OPPD, SECI, SPRM, SPS, WAUE, WFEC, WR]
+    example_path: /2025/DAILY_HOURLY_LOAD-20250101.csv
+    note: one column per load-serving entity code, not a normalized long format
+  - slug: ver-curtailments
+    grain: interval x curtailment reason
+    fields: [LocalIntervalEnding, GMTIntervalEnding, WindRedispatchCurtailments, WindManualCurtailments, WindCurtailedForEnergy, SolarRedispatchCurtailments, SolarManualCurtailments, SolarCurtailedForEnergy, BAA]
+    example_path: /2026/07/VER-Curtailments-20260725.csv
+  - slug: capacity-of-generation-on-outage
+    grain: market hour x balancing authority area x fuel type
+    fields: [Market Hour, BAA, Outaged MW, Coal MW, Diesel Fuel Oil MW, Hydro MW, Natural Gas MW, Nuclear MW, Solar MW, Waste Disposal MW, Wind MW, Waste Heat MW, Other MW]
+    example_path: /2026/07/Capacity-Gen-Outage-20260725.csv
+  - slug: generation-mix-historical
+    grain: 5-minute interval x fuel type
+    example_path: /SPP/GenMixYTD_SPP.csv
+  - slug: lmp-by-settlement-location-weis
+    grain: 5-minute interval x settlement location (Western Energy Imbalance Service)
+    fields: [Interval, GMTIntervalEnd, Settlement Location, Pnode, LMP, MLC, MCC, MEC]
+    example_path: /WEIS-RTBM-LMP-SL-latestInterval.csv
+  chart_api:
+    base_url: https://portal.spp.org/chart-api
+    feeds:
+    - {path: /gen-mix/asChart, format: application/json, shape: pieLabels plus 24 hourly MW series per fuel type, example_file: examples/spp-chart-api-gen-mix.json}
+    - {path: /load-forecast/asChart, format: application/json}
+    - {path: /gen-mix-365/asFile, format: text/csv, note: rolling 365-day generation mix}
+- name: price-contour-geospatial
+  source: probe
+  base_url: https://pricecontourmap.spp.org/arcgis/rest/services
+  standard: Esri ArcGIS REST API (ArcGIS Server 11.5)
+  note: >-
+    Geospatial projection of the same price data. The PCM folder exposes
+    DA_Features, DA_LMP, DELTA_Features, DELTA_LMP, RTBM_Features, RTBM_LMP,
+    States and Transmission MapServer services; RTBM_LMP describes itself as
+    updating every five minutes. Entity shapes are ArcGIS layer/field metadata,
+    discoverable per service with ?f=json.
+  example_file: examples/spp-arcgis-rtbm-lmp-mapserver.json
+gaps:
+- SPP publishes no JSON Schema, Avro, Parquet schema or data dictionary file for its public CSV datasets
+- no listing/index endpoint for the file-browser surface; paths must be constructed by convention
+- the member-facing Integrated Marketplace, Settlement Management System and WEIS data models live in
+  WSDL/XSD files distributed only inside the member-only Change User Forum and were not retrievable

@@ -36,7 +36,7 @@ accessModel:
   - documentation
   generated: '2026-07-27'
   method: manual
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/groq.png
+image: https://www.spp.org/logo.png
 tags:
 - Energy
 - United States
@@ -98,6 +98,11 @@ apis:
     url: https://portal.spp.org/pages/rtbm-lmp-by-location
   - type: Documentation
     url: https://www.spp.org/documents/19541/spp%20markets%20public%20data%20guide.pdf
+  - type: AgentSkill
+    name: Pull SPP public market data
+    url: skills/spp-public-market-data.md
+  - type: Examples
+    url: examples/_index.yml
 - aid: spp:spp-portal-chart-api
   name: SPP Portal Chart API
   description: >-
@@ -160,6 +165,11 @@ apis:
     url: openapi/trolie-standard-openapi.yml
   - type: Specification
     url: https://trolie.energy/spec
+  - type: Overlay
+    url: overlays/spp-trolie-standard-overlay.yaml
+  - type: AgentSkill
+    name: Exchange transmission ratings with SPP (LEP/TROLIE)
+    url: skills/spp-trolie-ratings-exchange.md
 - aid: spp:spp-integrated-marketplace-web-services
   name: SPP Integrated Marketplace Markets Web Service
   description: >-
@@ -185,20 +195,62 @@ apis:
   - type: Documentation
     url: https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
 common:
+- type: DomainSecurity
+  url: security/spp-domain-security.yml
+- type: OAuthScopes
+  url: scopes/spp-scopes.yml
+- type: Authentication
+  url: authentication/spp-authentication.yml
+- type: WellKnown
+  url: well-known/spp-well-known.yml
+- type: Conventions
+  url: conventions/spp-conventions.yml
+- type: ErrorCatalog
+  url: errors/spp-problem-types.yml
+- type: RateLimits
+  url: rate-limits/spp-rate-limits.yml
+- type: Lifecycle
+  url: lifecycle/spp-lifecycle.yml
+- type: Conformance
+  url: conformance/spp-conformance.yml
+- type: DataModel
+  url: data-model/spp-data-model.yml
+- type: Sandbox
+  url: sandbox/spp-sandbox.yml
+- type: Packages
+  url: packages/spp-packages.yml
+- type: Examples
+  url: examples/_index.yml
+- type: LLMsTxt
+  url: llms/spp-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
 - type: Website
   url: https://www.spp.org/
 - type: Portal
   url: https://portal.spp.org/
 - type: Documentation
   url: https://www.spp.org/stakeholder-center/user-guides-apis-integrations/
+- type: GettingStarted
+  url: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+- type: Roadmap
+  url: https://www.spp.org/stakeholder-center/spp-roadmap/
+- type: Compliance
+  url: https://www.spp.org/stakeholder-center/spp-rto-compliance/
+- type: SignUp
+  url: https://www.spp.org/account/create-account/
 - type: TermsOfService
-  url: https://portal.spp.org/terms-of-use
+  url: https://www.spp.org/terms-conditions/
+- type: PrivacyPolicy
+  url: https://www.spp.org/terms-conditions/
 - type: Support
   url: https://rms.spp.org/
 - type: Blog
   url: https://www.spp.org/newsroom/
 - type: LinkedIn
   url: https://www.linkedin.com/company/southwest-power-pool
+- type: Twitter
+  url: https://www.twitter.com/spporg
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

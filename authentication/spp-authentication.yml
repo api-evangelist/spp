@@ -1,0 +1,105 @@
+generated: '2026-07-27'
+method: searched
+source: openapi/trolie-standard-openapi.yml
+docs: https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
+note: >-
+  SPP runs two completely different authentication regimes. Everything a
+  developer can reach anonymously — the public data FTP site, the SPP Portal
+  file-browser and chart download paths, and the price-contour ArcGIS REST
+  services — requires no credential at all. Everything a market participant
+  transacts against requires an x.509 digital certificate from a Certificate
+  Authority SPP trusts (OATI webCARES for Integrated Marketplace applications)
+  presented over mTLS, plus an identity in SPP UAA whose assigned roles and
+  scope authorize the specific function. SPP publishes no OAuth authorization
+  server, no OpenID Connect discovery document and no API key issuance for those
+  APIs. The only OIDC discovery document served anywhere on an SPP host is for
+  rms.spp.org, the Salesforce-hosted Request Management System used to request
+  access — not an API authorization server.
+summary:
+  types: [none, apiKey, mutualTLS, oauth2, openIdConnect]
+  api_key_in: [query]
+  oauth2_flows: [clientCredentials]
+  anonymous_surfaces: 4
+  gated_surfaces: 2
+schemes:
+- name: anonymous-public-data
+  type: none
+  description: >-
+    No authentication. Verified anonymously on 2026-07-27 against
+    ftp://pubftp.spp.org (FTP 226), portal.spp.org/file-browser-api/download
+    (HTTP 200, text/csv), portal.spp.org/chart-api (HTTP 200, application/json)
+    and pricecontourmap.spp.org/arcgis/rest/services (HTTP 200, application/json).
+    No account, key, token, cookie or licence click-through is enforced in the
+    request path.
+  applies_to:
+  - spp:spp-public-data-ftp
+  - spp:spp-portal-file-browser-api
+  - spp:spp-portal-chart-api
+  sources: [probe]
+- name: arcgis-token
+  type: apiKey
+  in: query
+  parameter: token
+  description: >-
+    The ArcGIS Server behind the price contour map advertises token-based
+    security in its own service-info document — /arcgis/rest/info?f=json returns
+    isTokenBasedSecurity true with tokenServicesUrl
+    https://pricecontourmap.spp.org/arcgis/tokens/. The PCM folder services are
+    nonetheless readable anonymously; the token service governs privileged
+    operations. This is the standard Esri ArcGIS REST contract, not an
+    SPP-authored scheme.
+  applies_to: [spp:spp-price-contour-map-arcgis]
+  evidence: examples/spp-arcgis-rest-info.json
+  sources: [probe]
+- name: oati-webcares-x509-plus-uaa
+  type: mutualTLS
+  description: >-
+    Two-factor: an x.509 client certificate issued by a CA SPP trusts, presented
+    over mTLS, plus an SPP UAA identity whose roles and scope authorize the
+    function. SPP's "Digital Certificates and the Integrated Marketplace"
+    document states OATI webCARES is the Certificate Authority trusted by
+    Integrated Marketplace applications. SPP's System Interfaces Stakeholder
+    Reference Guide (v1.0, 2025-01-29) states most programmatic services require
+    two-factor authentication. The SPP LEP/TROLIE API Data Exchange Guide (v1.0,
+    2024-11-08) describes UAA authenticating the certificate and then looking up
+    the user's roles and scope per connection. Access is provisioned by a Local
+    Security Administrator and requested through an RMS ticket.
+  applies_to:
+  - spp:spp-lep-trolie-api
+  - spp:spp-integrated-marketplace-web-services
+  sources:
+  - https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
+  - https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
+  - https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+- name: oauth2-primary-flow
+  type: oauth2
+  standard_scheme: true
+  description: >-
+    Declared by the LF Energy TROLIE community specification (the contract SPP's
+    LEP guide directs implementers to), not by an SPP-hosted authorization
+    server. clientCredentials flow with 15 read:/write: scopes and RFC 8725 JWT
+    token guidance. The spec's tokenUrl is relative to its placeholder server
+    host, so no real SPP token endpoint can be derived from it.
+  flows:
+  - flow: clientCredentials
+    tokenUrl: relative /oauth2 against the spec placeholder server (no SPP host published)
+    scopes: 15
+  applies_to: [spp:spp-lep-trolie-api]
+  sources: [openapi/trolie-standard-openapi.yml]
+  scopes_artifact: scopes/spp-scopes.yml
+- name: rms-openid-connect
+  type: openIdConnect
+  openIdConnectUrl: https://rms.spp.org/.well-known/openid-configuration
+  description: >-
+    OIDC discovery document served anonymously by SPP's Request Management
+    System (Salesforce Experience Cloud). issuer https://rms.spp.org, authorize
+    /services/oauth2/authorize, token /services/oauth2/token, jwks /id/keys,
+    RS256, PKCE S256, dynamic client registration advertised. Governs access to
+    the ticketing system a stakeholder uses to request API access — it is not
+    the authorization server for any SPP data or market API.
+  evidence: well-known/spp-rms-openid-configuration.json
+  sources: [probe]
+not_found:
+- API key issuance or developer key management of any kind
+- OAuth authorization server or OIDC discovery for any SPP data or market API
+- self-serve developer registration

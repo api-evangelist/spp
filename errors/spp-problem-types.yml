@@ -1,0 +1,275 @@
+generated: '2026-07-27'
+method: derived
+source: openapi/trolie-standard-openapi.yml
+standard: LF Energy TROLIE 1.1.0
+format: rfc9457
+note: Derived from the 4xx/5xx responses of the LF Energy TROLIE specification, the contract SPP's LEP/TROLIE
+  API Data Exchange Guide directs implementers to. SPP publishes no error reference of its own for any
+  of its APIs, and its anonymous public-data surface (file-browser-api, chart-api, FTP) returns bare HTTP
+  status codes with no error body at all — a request for a path that does not exist returns HTTP 404 with
+  a zero-byte body. The problem types below therefore describe the ratings-exchange contract, not the
+  open data surface.
+envelope:
+  media_type: application/problem+json
+  schema: components.schemas.problem
+  rfc: RFC 9457 (Problem Details for HTTP APIs)
+  rate_limit_headers:
+  - X-Rate-Limit-Limit
+  - X-Rate-Limit-Remaining
+  - X-Rate-Limit-Reset
+  retry_header: Retry-After (on 429)
+problems:
+- status: 400
+  component: 400-problem
+  title: Malformed request
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 28
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+- status: 401
+  component: 401-empty
+  title: Unauthorized
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 28
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+- status: 403
+  component: 403-empty
+  title: Access denied
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 28
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+- status: 404
+  component: 404-empty
+  title: Not Found
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 20
+  example_operations:
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+  - deleteSeasonalOverride
+- status: 406
+  component: '406'
+  title: Not Acceptable (Content negotiation failed)
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 4
+  example_operations:
+  - getHistoricalLimitsForecastSnapshot
+  - getLimitsForecastSnapshot
+  - getRegionalLimitsForecastSnapshot
+  - getSeasonalRatingsSnapshot
+- status: 406
+  component: 406-problem
+  title: Not Acceptable (Content negotiation failed)
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 19
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - getDefaultMonitoringSet
+- status: 406
+  component: inline
+  title: Not Acceptable (Content negotiation failed)
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 2
+  example_operations:
+  - getRealTimeLimits
+  - getRegionalRealTimeLimits
+- status: 409
+  component: '409'
+  title: Conflict
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 2
+  example_operations:
+  - deleteMonitoringSet
+  - updateMonitoringSet
+- status: 409
+  component: inline
+  title: Conflict with Forecast Window
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 2
+  example_operations:
+  - patchRatingForecastProposal
+  - postRegionalLimitsForecastSnapshot
+- status: 409
+  component: inline
+  title: Conflict with Seasonal Ratings Schedule
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 1
+  example_operations:
+  - patchSeasonalRatingsProposal
+- status: 409
+  component: inline
+  title: Seasonal overrides already employed in Operations cannot be deleted.
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 1
+  example_operations:
+  - deleteSeasonalOverride
+- status: 409
+  component: inline
+  title: Temporary AAR Exceptions already employed in Operations cannot be deleted.
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 1
+  example_operations:
+  - deleteTemporaryAARException
+- status: 409
+  component: inline
+  title: Conflict
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 1
+  example_operations:
+  - createMonitoringSet
+- status: 410
+  component: 410-problem
+  title: Gone. The requested resource is no longer available. TROLIE implementations MAY return this status
+    code when a resource is known to have been deleted or archived, if the authenticated client would
+    ot
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 3
+  example_operations:
+  - getHistoricalLimitsForecastSnapshot
+  - getSeasonalOverride
+  - getTemporaryAARException
+- status: 413
+  component: 413-empty
+  title: Payload too large
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 10
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - patchRatingForecastProposal
+- status: 415
+  component: 415-problem
+  title: Unsupported media type
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 10
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - patchRatingForecastProposal
+- status: 422
+  component: 422-problem
+  title: Unprocessable content
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 7
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - patchSeasonalRatingsProposal
+- status: 422
+  component: inline
+  title: Unprocessable Content. The requested `temporal_resolution` is not supported.
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 3
+  example_operations:
+  - getHistoricalLimitsForecastSnapshot
+  - getLimitsForecastSnapshot
+  - getRegionalLimitsForecastSnapshot
+- status: 422
+  component: inline
+  title: Unprocessable Content
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 2
+  example_operations:
+  - patchRatingForecastProposal
+  - postRegionalLimitsForecastSnapshot
+- status: 422
+  component: inline
+  title: Unprocessable Content. The Real-Time Ratings Proposal may not utilize units that are not permitted
+    by the Clearinghouse Provider. Check the response for details.
+  media_types:
+  - application/problem+json
+  format: rfc9457
+  operation_count: 1
+  example_operations:
+  - postRealTimeProposal
+- status: 429
+  component: 429-empty
+  title: Too many requests (rate limiting)
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 28
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+- status: 500
+  component: 500-empty
+  title: An unexpected error occurred
+  media_types:
+  - application/*
+  format: empty-body
+  operation_count: 28
+  example_operations:
+  - createMonitoringSet
+  - createSeasonalOverride
+  - createTemporaryAARException
+  - deleteMonitoringSet
+open_data_surface:
+  note: 'Verified 2026-07-27: https://portal.spp.org/file-browser-api/ and https://portal.spp.org/chart-api/
+    return HTTP 404 with a zero-byte body and no content-type; there is no listing endpoint and no structured
+    error envelope. portal.spp.org returns the 609-byte SPA index shell with HTTP 200 for unknown non-API
+    paths, so 200 is not by itself proof a dataset exists.'
+  observed:
+  - url: https://portal.spp.org/file-browser-api/
+    status: 404
+    body_bytes: 0
+  - url: https://portal.spp.org/chart-api/
+    status: 404
+    body_bytes: 0

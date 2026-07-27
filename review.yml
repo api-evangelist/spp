@@ -341,6 +341,59 @@ probes:
 - url: https://github.com/SouthwestPowerPool
   status: 404
   note: No SPP GitHub organization found.
+- url: https://rms.spp.org/.well-known/openid-configuration
+  status: 200
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. Real OIDC discovery document, application/json, 2249 bytes —
+    the only /.well-known/ hit anywhere on SPP infrastructure. issuer
+    https://rms.spp.org, Salesforce Experience Cloud platform scopes. Governs the
+    RMS ticketing system used to request access, not any SPP data or market API.
+    Saved to well-known/spp-rms-openid-configuration.json.
+- url: ftp://pubftp-mte.itespp.org/
+  status: 226
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. SPP's Model Test Environment public data FTP site, named in
+    the Public Data Access guide. Anonymous listing succeeded, 16 top-level
+    directories mirroring production.
+- url: https://portal-mte.itespp.org/file-browser-api/download/rtbm-mcp?path=/RTBM-MCP-latestInterval.csv
+  status: 200
+  contentType: text/csv
+  bytes: 1078
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. The MTE portal mirrors the production file-browser-api path
+    conventions and is reachable anonymously — a usable rehearsal environment.
+    portal-mte.itespp.org 200, marketplace-mte.itespp.org 302, uaa-mte.itespp.org 200.
+- url: https://uaa.spp.org/.well-known/openid-configuration
+  status: 200
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. SPP UAA resolves (uaa.ha.spp.org) but serves an 868-byte
+    React index shell for every path including /info, /login and /token_keys. No
+    anonymous discovery document.
+- url: https://pricecontourmap.spp.org/arcgis/rest/info?f=json
+  status: 200
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. ArcGIS Server 11.5 info document; isTokenBasedSecurity true
+    with tokenServicesUrl https://pricecontourmap.spp.org/arcgis/tokens/. Saved to
+    examples/spp-arcgis-rest-info.json.
+- url: https://www.spp.org/terms-conditions/
+  status: 200
+  date: '2026-07-27'
+  note: >-
+    Enrichment round. Carries both the Terms & Conditions and the SPP Privacy
+    Policy. The portal.spp.org/terms-of-use route returns only the SPA shell.
+- url: https://www.spp.org/stakeholder-center/spp-roadmap/
+  status: 200
+  date: '2026-07-27'
+  note: Enrichment round. Organization-wide Strategic Roadmap; not an API roadmap.
+- url: https://status.spp.org/
+  status: 000
+  date: '2026-07-27'
+  note: Enrichment round. Does not resolve — no API/system status page exists.
 sources:
 - url: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
   type: Documentation

@@ -1,0 +1,77 @@
+generated: '2026-07-27'
+method: searched
+source:
+- https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
+- https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+- https://www.spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+- probes of status.spp.org and www.spp.org on 2026-07-27
+note: >-
+  SPP versions documents, not interfaces. Every reference guide is published as a
+  versioned, dated PDF (System Interfaces Stakeholder Reference Guide v1.0
+  2025-01-29; LEP/TROLIE API Data Exchange Guide v1.0 2024-11-08; Public Data
+  Access v3.0 July 2023), and revisions to market systems move through the SPP
+  Revision Request process and the Change User Forum. There is no API version
+  segment, no version header, no published deprecation policy, no Sunset or
+  Deprecation header support and no service-level agreement for any interface. No
+  API status page exists: status.spp.org does not resolve.
+versioning:
+  scheme: versioned-documents
+  in_path: false
+  in_header: false
+  current:
+    system_interfaces_guide: {version: '1.0', date: '2025-01-29'}
+    lep_trolie_guide: {version: '1.0', date: '2024-11-08'}
+    public_data_access_guide: {version: '3.0', date: '2023-07'}
+    trolie_specification: {version: 1.1.0, source: openapi/trolie-standard-openapi.yml}
+  docs: https://www.spp.org/stakeholder-center/user-guides-apis-integrations/
+  change_process:
+    name: SPP Revision Request process
+    url: https://www.spp.org/governance/spp-revision-requests/
+    note: >-
+      Tariff and protocol changes — including changes that reach market systems —
+      are filed, tracked and approved as Revision Requests through SPP governance.
+      Technical interface changes are communicated to market participants through
+      the member-facing Change User Forum, not through a public changelog.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  deprecated_operations: []
+  note: >-
+    No deprecation policy was found. The TROLIE specification marks no operation
+    deprecated. The one announced interface migration is Markets+, which SPP
+    states will use RESTful APIs rather than the SOAP services used by the
+    existing Integrated Marketplace, with a targeted 2027 go-live — announced as
+    a new platform, not as a dated deprecation of the SOAP services.
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    No SLA or uptime commitment is published for any interface. SPP's own
+    reference guide states that access or exchange of data outside officially
+    published SPP interface specifications is "neither supported nor encouraged",
+    which is the closest thing to a support statement covering the HTTP
+    file-browser-api and chart-api paths.
+status_page: null
+status_page_note: >-
+  status.spp.org does not resolve (curl exit 000, 2026-07-27). SPP publishes
+  https://www.spp.org/markets-operations/current-grid-conditions/, which reports
+  the state of the power grid — load, generation mix, reserve margins — not the
+  availability of SPP's own systems or APIs. Planned system outages are
+  communicated to members through RMS notifications, which are not public.
+roadmap:
+  url: https://www.spp.org/stakeholder-center/spp-roadmap/
+  scope: organization-wide strategic roadmap, not an API roadmap
+  note: >-
+    SPP publishes a Strategic Roadmap of the initiatives critical to its
+    strategic goals. Interface-affecting programmes appear there (Markets+, RTO
+    expansion, western services) but no API-level roadmap or release schedule is
+    published.
+milestones:
+- date: '2024-11-08'
+  event: SPP LEP/TROLIE API Data Exchange Guide v1.0 published, implementing FERC Order 881 ambient-adjusted ratings exchange against the LF Energy TROLIE specification
+- date: '2025-01-29'
+  event: SPP System Interfaces Stakeholder Reference Guide v1.0 published, inventorying every stakeholder interface and its type
+- date: '2027'
+  event: Markets+ targeted go-live; SPP states the platform will expose RESTful APIs rather than the SOAP services used by the Integrated Marketplace

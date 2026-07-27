@@ -1,0 +1,84 @@
+generated: '2026-07-27'
+method: searched
+source: live probes of every SPP host in apis.yml on 2026-07-27
+note: >-
+  Five /.well-known/ paths were probed against six SPP hosts. Only one real
+  discovery document exists: an OpenID Connect configuration served by
+  rms.spp.org, SPP's Request Management System (the Salesforce Experience Cloud
+  ticketing front door used to request access to member systems). It describes
+  the identity provider in front of RMS, not the SPP Integrated Marketplace,
+  WEIS or LEP/TROLIE participant APIs — those authenticate with an OATI
+  webCARES x.509 certificate plus an SPP UAA role and publish no discovery
+  document. portal.spp.org is a React single-page app whose server returns the
+  609-byte index shell with HTTP 200 for every unknown path, so every 200 on
+  that host is a false positive and is recorded as such.
+hosts:
+- host: https://rms.spp.org
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: application/json;charset=UTF-8
+    bytes: 2249
+    file: spp-rms-openid-configuration.json
+    note: >-
+      Real OIDC discovery document. issuer https://rms.spp.org, authorization
+      endpoint /services/oauth2/authorize, token endpoint /services/oauth2/token,
+      jwks_uri /id/keys, dynamic client registration at /services/oauth2/register,
+      RS256 id tokens, PKCE (S256) supported. The scopes_supported list is the
+      Salesforce platform scope set, which identifies the platform hosting RMS.
+  - path: /.well-known/security.txt
+    status: 401
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/ai-plugin.json
+    status: 401
+- host: https://www.spp.org
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://spp.org
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://portal.spp.org
+  note: >-
+    Single-page app. All five paths returned HTTP 200 with content-type
+    text/html and exactly 609 bytes — the React index shell, not a discovery
+    document. Treated as absent.
+  documents:
+  - {path: /.well-known/security.txt, status: 200, valid: false, bytes: 609}
+  - {path: /.well-known/openid-configuration, status: 200, valid: false, bytes: 609}
+  - {path: /.well-known/oauth-authorization-server, status: 200, valid: false, bytes: 609}
+  - {path: /.well-known/api-catalog, status: 200, valid: false, bytes: 609}
+  - {path: /.well-known/ai-plugin.json, status: 200, valid: false, bytes: 609}
+- host: https://pricecontourmap.spp.org
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://opsportal.spp.org
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://uaa.spp.org
+  note: >-
+    SPP UAA resolves (uaa.ha.spp.org) and serves an 868-byte React index shell
+    with HTTP 200 for every path including /.well-known/openid-configuration,
+    /info, /login and /token_keys. No discovery document is exposed anonymously.
+  documents:
+  - {path: /.well-known/openid-configuration, status: 200, valid: false, bytes: 868}
+security_txt: null
+api_catalog: null

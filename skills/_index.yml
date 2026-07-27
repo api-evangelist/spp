@@ -1,0 +1,45 @@
+generated: '2026-07-27'
+method: generated
+source:
+- openapi/trolie-standard-openapi.yml
+- verified anonymous probes recorded in review.yml
+note: >-
+  Two packaged agent skills covering the two halves of SPP's surface: the
+  anonymous public market-data path any developer can use today, and the
+  member-gated LEP/TROLIE ratings exchange. Every operationId referenced in the
+  TROLIE skill exists verbatim in openapi/trolie-standard-openapi.yml; the public
+  data skill has no operationIds because SPP publishes no specification for that
+  surface, so it is grounded in the endpoints verified by probe on 2026-07-27.
+  SPP publishes no AGENTS.md or skill files of its own.
+skills:
+- file: spp-public-market-data.md
+  name: Pull SPP public market data
+  api: spp:spp-portal-file-browser-api
+  spec: null
+  operations: []
+  grounding: verified anonymous endpoints (data-model/spp-data-model.yml)
+- file: spp-trolie-ratings-exchange.md
+  name: Exchange transmission ratings with SPP (LEP/TROLIE)
+  api: spp:spp-lep-trolie-api
+  spec: openapi/trolie-standard-openapi.yml
+  operations:
+  - getDefaultMonitoringSet
+  - createMonitoringSet
+  - getMonitoringSet
+  - updateMonitoringSet
+  - deleteMonitoringSet
+  - patchRatingForecastProposal
+  - getRatingForecastProposalStatus
+  - getLimitsForecastSnapshot
+  - getHistoricalLimitsForecastSnapshot
+  - postRealTimeProposal
+  - getRealTimeProposalStatus
+  - getRealTimeLimits
+  - patchSeasonalRatingsProposal
+  - getSeasonalRatingProposalStatus
+  - getSeasonalRatingsSnapshot
+  - createSeasonalOverride
+  - getSeasonalOverrides
+  - createTemporaryAARException
+  - getTemporaryAARExceptions
+  grounding: operationIds verified against openapi/trolie-standard-openapi.yml

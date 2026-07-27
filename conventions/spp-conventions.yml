@@ -1,0 +1,111 @@
+generated: '2026-07-27'
+method: derived
+source:
+- openapi/trolie-standard-openapi.yml
+- live probes of portal.spp.org and pricecontourmap.spp.org on 2026-07-27
+docs: https://www.spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+note: >-
+  SPP has no single set of API conventions, because it has no single API
+  programme. Three distinct contracts coexist: (1) the anonymous public
+  market-data surface, whose only convention is a file-path naming scheme over
+  CSV; (2) the LF Energy TROLIE ratings-exchange contract SPP adopted for FERC
+  Order 881, which is a genuinely modern HTTP contract with conditional GET,
+  rate-limit headers and RFC 9457 problem details — but is the community
+  standard's contract, not SPP's own authoring; (3) the SOAP Integrated
+  Marketplace web services, whose WSDL/XSD conventions are member-only and were
+  not retrievable. Nothing below is invented: each row cites the spec section or
+  the probe that produced it.
+surfaces:
+- name: public-market-data
+  applies_to: [spp:spp-public-data-ftp, spp:spp-portal-file-browser-api, spp:spp-portal-chart-api]
+  authentication: none (anonymous HTTP GET and anonymous FTP)
+  media_types: [text/csv, application/json]
+  addressing:
+    style: dataset-slug plus path query parameter
+    pattern: /file-browser-api/download/{dataset}?path={file}
+    latest: stable "latestInterval" file names for real-time datasets
+    historical: date-partitioned convention /YYYY/MM/NAME-YYYYMMDD.csv
+    listing: none — /file-browser-api/ returns HTTP 404 with an empty body
+  pagination: none (whole-file download)
+  filtering: none (server-side filtering is not supported; filter after download)
+  versioning: none published (no version segment, no version header, no dated contract)
+  idempotency: not applicable (read-only GET surface, no write operations)
+  rate_limiting: none published and none observed in response headers
+  request_tracing: none published
+  error_envelope: bare HTTP status codes, zero-byte bodies on 404
+  caveat: >-
+    SPP's own System Interfaces Stakeholder Reference Guide warns that "any
+    access or exchange of data outside of officially published SPP interface
+    specifications is neither supported nor encouraged." SPP formally supports
+    FTP as the programmatic path; the HTTP file-browser-api and chart-api paths
+    that most third-party tools use are the portal's own internals.
+- name: trolie-ratings-exchange
+  applies_to: [spp:spp-lep-trolie-api]
+  standard: LF Energy TROLIE 1.1.0
+  source: openapi/trolie-standard-openapi.yml
+  authentication: >-
+    SPP implementation: OATI webCARES x.509 certificate over mTLS plus SPP UAA
+    role and scope. The spec itself declares an oauth2 clientCredentials scheme
+    with 15 read:/write: scopes.
+  media_types:
+    request: [application/json]
+    error: [application/problem+json]
+  conditional_requests:
+    supported: true
+    headers: [ETag, If-None-Match]
+    response: 304 Not Modified
+    guidance: >-
+      The spec instructs clients to poll snapshot endpoints with a conditional
+      GET using the ETag from the previous response rather than re-downloading.
+  idempotency:
+    idempotency_key: false
+    note: >-
+      No Idempotency-Key header or equivalent is defined. Write semantics rely on
+      HTTP method semantics (PUT/DELETE on /monitoring-sets/{id},
+      /seasonal-overrides/{id}, /temporary-aar-exceptions/{id}) and on 409
+      Conflict responses for schedule/window conflicts, not on a replayable
+      request key.
+  rate_limiting:
+    headers: [X-Rate-Limit-Limit, X-Rate-Limit-Remaining, X-Rate-Limit-Reset]
+    exhausted_status: 429
+    retry_header: Retry-After
+    published_limits: none — SPP publishes no numeric limits for its implementation
+  error_envelope:
+    format: rfc9457
+    media_type: application/problem+json
+    schema: components.schemas.problem
+    catalog: errors/spp-problem-types.yml
+  content_negotiation:
+    note: >-
+      Snapshot and proposal resources are offered in full, "slim" and "detailed"
+      representations, plus elide-psr variants; 406 Not Acceptable with a problem
+      body is returned when negotiation fails, and 415 on an unsupported media type.
+  versioning:
+    scheme: specification version (TROLIE 1.1.0); SPP publishes its own guide as a versioned PDF (v1.0, 2024-11-08)
+    in_path: false
+  pagination: none defined; snapshots are period-scoped whole documents
+  request_tracing: none defined
+- name: price-contour-arcgis
+  applies_to: [spp:spp-price-contour-map-arcgis]
+  standard: Esri ArcGIS REST API (ArcGIS Server 11.5)
+  format_negotiation: ?f=json | ?f=html | ?f=pjson query parameter
+  authentication: >-
+    Anonymous read on the PCM folder. /arcgis/rest/info?f=json advertises
+    isTokenBasedSecurity true with tokenServicesUrl
+    https://pricecontourmap.spp.org/arcgis/tokens/ and a short-lived token validity.
+  error_envelope: ArcGIS {"error":{"code":...,"message":...}} JSON (Esri convention)
+  versioning: currentVersion 11.5 / fullVersion 11.5.0 reported by the service
+- name: integrated-marketplace-soap
+  applies_to: [spp:spp-integrated-marketplace-web-services]
+  transport: SOAP and REST web services over HTTPS
+  authentication: two-factor — x.509 certificate plus SPP UAA identity
+  contracts: WSDL and XSD, distributed only in member-facing Change User Forum technical reference documents
+  note: not retrievable anonymously; no conventions can be recorded first-hand
+cross_links:
+  errors: errors/spp-problem-types.yml
+  authentication: authentication/spp-authentication.yml
+  scopes: scopes/spp-scopes.yml
+  rate_limits: rate-limits/spp-rate-limits.yml
+  lifecycle: lifecycle/spp-lifecycle.yml
+  data_model: data-model/spp-data-model.yml
+idempotency_supported: false

@@ -1,0 +1,112 @@
+generated: '2026-07-27'
+method: derived
+source: openapi/trolie-standard-openapi.yml
+docs: https://trolie.energy/spec
+standard: LF Energy TROLIE 1.1.0
+note: >-
+  These scopes are declared by the LF Energy TROLIE community specification —
+  the contract SPP's own "SPP LEP/TROLIE API Data Exchange Guide" (v1.0,
+  2024-11-08) directs implementers to — not by an SPP-published authorization
+  server. SPP publishes no OAuth authorization server, no token URL and no scope
+  reference of its own; its LEP ratings API authenticates with an OATI webCARES
+  x.509 certificate plus an SPP UAA role (see
+  authentication/spp-authentication.yml). Treat this as the scope vocabulary an
+  SPP LEP integration is built against, not as an observed SPP OAuth surface.
+schemes:
+- name: oauth2-primary-flow
+  source: openapi/trolie-standard-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: relative /oauth2 against the spec placeholder server (no SPP host published)
+  description: Support RFC8725 JWT tokens.
+scopes:
+- scope: read:forecast-proposals
+  description: Read Forecast rating proposals
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:monitoring-sets
+  description: Read monitoring sets
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:operating-snapshot
+  description: Read the ratings and limits snapshots in-use by the transmission provider
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:realtime-proposals
+  description: Read real-time rating proposals
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:regional-operating-snapshot
+  description: Read a Regional Operating Snapshot
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:seasonal-overrides
+  description: Read seasonal overrides
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:seasonal-proposals
+  description: Read seasonal rating proposals
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: read:temporary-aar-exceptions
+  description: Read temporary AAR exceptions
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:forecast-proposals
+  description: Submit forecasted ratings
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:monitoring-sets
+  description: Write monitoring sets
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:realtime-proposals
+  description: Submit realtime ratings
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:regional-operating-snapshot
+  description: Write a Regional Operating Snapshot
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:seasonal-overrides
+  description: Write seasonal overrides
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:seasonal-proposals
+  description: Submit seasonal ratings
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml
+- scope: write:temporary-aar-exceptions
+  description: Write temporary AAR exceptions
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/trolie-standard-openapi.yml

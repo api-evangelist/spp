@@ -1,0 +1,48 @@
+generated: '2026-07-27'
+method: derived
+source: openapi/trolie-standard-openapi.yml
+note: >-
+  SPP publishes no numeric rate limits for any of its APIs. The only rate-limit
+  contract in scope is the signalling defined by the LF Energy TROLIE
+  specification that SPP's LEP/TROLIE Data Exchange Guide adopts: every response,
+  success or failure, carries the three X-Rate-Limit-* headers, and an exhausted
+  quota returns 429 with Retry-After. No limit counts are recorded below because
+  none are published — an implementation supplies its own values at runtime. The
+  anonymous public-data surface (FTP, file-browser-api, chart-api) returned no
+  rate-limit headers at all on 2026-07-27 and no limits are documented for it.
+signalling:
+  standard: LF Energy TROLIE 1.1.0
+  headers:
+  - name: X-Rate-Limit-Limit
+    meaning: the number of allowed requests in the current period
+  - name: X-Rate-Limit-Remaining
+    meaning: the number of remaining requests in the current period
+  - name: X-Rate-Limit-Reset
+    meaning: the number of seconds left in the current period
+  - name: Retry-After
+    meaning: returned with 429 Too Many Requests
+  exhausted_status: 429
+  applied_to: all 28 operations in the specification, on every documented response
+  polling_guidance: >-
+    The specification directs clients to poll snapshot endpoints with a
+    conditional GET (If-None-Match against the previous ETag) so that unchanged
+    snapshots return 304 and do not consume the request budget unnecessarily.
+limits: []
+published_limits: false
+surfaces:
+- api: spp:spp-lep-trolie-api
+  limits_published: false
+  signalling: true
+- api: spp:spp-portal-file-browser-api
+  limits_published: false
+  signalling: false
+  observed: no rate-limit headers on any of the eight datasets probed 2026-07-27
+- api: spp:spp-portal-chart-api
+  limits_published: false
+  signalling: false
+- api: spp:spp-public-data-ftp
+  limits_published: false
+  signalling: false
+- api: spp:spp-price-contour-map-arcgis
+  limits_published: false
+  signalling: false

@@ -1,0 +1,64 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the SPP LEP/TROLIE ratings exchange
+  version: 1.0.0
+extends: openapi/trolie-standard-openapi.yml
+x-apievangelist:
+  generated: '2026-07-27'
+  method: generated
+  source: openapi/trolie-standard-openapi.yml
+  note: >-
+    The extended document is the LF Energy TROLIE community specification, not an
+    SPP-authored contract. SPP's "SPP LEP/TROLIE API Data Exchange Guide" v1.0
+    (2024-11-08) directs implementers to it and publishes no base URL of its own;
+    the spec's servers block carries the standard's placeholder host. This
+    overlay records that provenance and the SPP-specific access reality on top of
+    the untouched spec — it never mutates the harvested original.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: Southwest Power Pool
+    x-apievangelist-provider-aid: spp
+    x-apievangelist-api-aid: spp:spp-lep-trolie-api
+    x-apievangelist-spec-provenance: >-
+      LF Energy TROLIE community specification 1.1.0, harvested verbatim from
+      https://trolie.energy/openapi-1.0.yaml (HTTP 200, 2026-07-27). NOT authored
+      or published by Southwest Power Pool.
+    x-apievangelist-implementation-guide: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+    x-apievangelist-regulatory-driver: FERC Order 881 (ambient-adjusted transmission ratings)
+    x-apievangelist-verification-status: live-claimed-unverified
+- target: $.servers
+  update:
+  - url: https://trolie.example.com
+    description: >-
+      Specification placeholder host. SPP publishes no production base URL for its
+      LEP implementation — its own guide writes every example against
+      https://<baseURL>/. A participant receives the endpoint through SPP
+      onboarding, not from public documentation.
+- target: $.info
+  update:
+    x-apievangelist-access:
+      model: member-gated
+      authentication: OATI webCARES x.509 certificate over mTLS plus an SPP UAA role and scope
+      provisioning: Local Security Administrator role assignment, requested via an RMS ticket at https://rms.spp.org/
+      anonymous_access: false
+      artifact: authentication/spp-authentication.yml
+- target: $.info
+  update:
+    x-apievangelist-artifacts:
+      authentication: authentication/spp-authentication.yml
+      scopes: scopes/spp-scopes.yml
+      errors: errors/spp-problem-types.yml
+      conventions: conventions/spp-conventions.yml
+      rate_limits: rate-limits/spp-rate-limits.yml
+      lifecycle: lifecycle/spp-lifecycle.yml
+      conformance: conformance/spp-conformance.yml
+      data_model: data-model/spp-data-model.yml
+      skills: skills/_index.yml
+- target: $.components.securitySchemes['oauth2-primary-flow']
+  update:
+    x-apievangelist-note: >-
+      Declared by the community specification. SPP hosts no OAuth authorization
+      server for this API and publishes no token URL; the effective SPP scheme is
+      certificate-plus-UAA. The 15 scopes are the standard's vocabulary, captured
+      in scopes/spp-scopes.yml.

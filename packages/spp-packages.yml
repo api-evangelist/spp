@@ -1,0 +1,46 @@
+generated: '2026-07-27'
+method: searched
+source:
+- npm registry search (2026-07-27)
+- PyPI (2026-07-27)
+- GitHub repository search (2026-07-27)
+note: >-
+  Southwest Power Pool publishes no client library in any registry. npm, PyPI and
+  GitHub were searched for SPP-authored packages and none exist; SPP has no
+  GitHub organization (github.com/SouthwestPowerPool returns 404). The community
+  has filled the gap: SPP's public market data is one of the ISO/RTO feeds
+  supported by the third-party gridstatus Python library, and an older Java
+  client for SPP's CSV reports exists on GitHub. Both are recorded with
+  official:false — they are not SPP software and carry no SPP support.
+packages: []
+official_packages: 0
+third_party:
+- language: python
+  registry: pypi
+  name: gridstatus
+  url: https://pypi.org/project/gridstatus/
+  install: pip install gridstatus
+  official: false
+  note: >-
+    Third-party open-source library for US ISO/RTO grid data that includes an SPP
+    adapter over the same public portal file paths catalogued in
+    data-model/spp-data-model.yml. Verified present on PyPI (HTTP 200,
+    2026-07-27). Not authored, endorsed or supported by SPP.
+- language: java
+  registry: github
+  name: r24mille/SppPublicReportClient
+  url: https://github.com/r24mille/SppPublicReportClient
+  official: false
+  note: >-
+    Community Java client for Southwest Power Pool .csv reports, found by GitHub
+    search 2026-07-27. Unaffiliated with SPP; age and maintenance status not
+    assessed.
+registries_searched:
+- {registry: npm, query: 'southwest power pool / trolie', result: no first-party or SPP-specific package}
+- {registry: pypi, queries: [spp-api, sppdata, trolie, trolie-client], result: all 404}
+- {registry: github, query: southwest power pool, result: community repositories only; no SPP organization}
+- {registry: maven-central, result: not searched — no evidence of any JVM client published by SPP}
+gaps:
+- SPP ships no SDK, no client library and no code samples for any interface
+- the member-facing SOAP services are consumed from WSDL/XSD distributed inside the Change User Forum,
+  with no generated-client distribution

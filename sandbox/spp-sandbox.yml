@@ -1,0 +1,59 @@
+generated: '2026-07-27'
+method: searched
+source:
+- https://www.spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+- live probes of the itespp.org MTE hosts on 2026-07-27
+note: >-
+  SPP runs a parallel Model Test Environment (MTE) on the itespp.org domain that
+  mirrors its production stakeholder systems. SPP's own Public Data Access guide
+  (v3.0, July 2023) names the MTE public data FTP site alongside production,
+  which is how the environment was found; the HTTP mirrors were then confirmed by
+  probe. This is a member test environment for market systems, not a developer
+  sandbox: the public-data half is reachable anonymously and returns real-shaped
+  test data, but there is no self-serve signup, no test credential issuance, no
+  fixture/trigger tooling and no published test values. Member access to the
+  gated MTE systems is provisioned through the same certificate-plus-UAA path as
+  production. Nothing in this file is invented — every host below was probed on
+  2026-07-27 and its status recorded.
+environments:
+- name: production
+  hosts:
+    public_data_ftp: ftp://pubftp.spp.org
+    portal: https://portal.spp.org
+    marketplace: https://marketplace.spp.org
+    uaa: https://uaa.spp.org
+- name: model-test-environment
+  abbreviation: MTE
+  domain: itespp.org
+  documented_by: SPP Public Data Access v3.0 (names ftp://pubftp-mte.itespp.org as the MTE public data site)
+  hosts:
+  - {host: 'ftp://pubftp-mte.itespp.org', status: 226, note: 'anonymous FTP listing succeeded; 16 top-level directories including Markets, Operational_Data, Operations_Reports, Settlements, Reliability, TCR, Market_Monitoring, West_EIS'}
+  - {host: 'https://portal-mte.itespp.org', status: 200, note: 'MTE mirror of the SPP Portal single-page app'}
+  - {host: 'https://marketplace-mte.itespp.org', status: 302, note: 'redirects to the MTE portal, mirroring production marketplace.spp.org behaviour'}
+  - {host: 'https://uaa-mte.itespp.org', status: 200, note: 'MTE mirror of SPP UAA; React shell, no anonymous discovery document'}
+  verified_endpoints:
+  - url: https://portal-mte.itespp.org/file-browser-api/download/rtbm-mcp?path=/RTBM-MCP-latestInterval.csv
+    status: 200
+    content_type: text/csv
+    bytes: 1078
+    note: same dataset slug and path convention as production, anonymous
+  - url: https://portal-mte.itespp.org/chart-api/gen-mix/asChart
+    status: 200
+    content_type: application/json
+    bytes: 4788
+    note: same chart feed contract as production, anonymous
+test_credentials:
+  published: false
+  note: >-
+    No test certificates, test API keys, magic identifiers or test market
+    participant IDs are published. MTE access to gated systems requires the same
+    OATI webCARES x.509 certificate and SPP UAA role assignment as production,
+    requested through an RMS ticket.
+test_values: []
+fixtures_or_triggers: none published
+time_simulation: none published
+usage_guidance: >-
+  Use the MTE hosts to develop and rehearse against SPP's public-data path
+  conventions without touching production, and to validate a client's handling of
+  dataset slugs, date-partitioned paths and CSV column headers. Do not treat MTE
+  prices, load or generation values as market truth — it is a model environment.
