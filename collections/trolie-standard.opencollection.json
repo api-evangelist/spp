@@ -1,0 +1,955 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Transmission Ratings and Operating Limits Information Exchange (TROLIE)",
+    "version": "1.1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://no-server/oauth2",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Forecasting",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Limits Forecast Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/limits/forecast-snapshot",
+            "params": [
+              {
+                "name": "offset-period-start",
+                "value": "",
+                "type": "query",
+                "description": "Rather than return the entire forecast from the beginning, i.e., the next operating period, instead return a subset of the forecast starting with the period starting at `offset-period-start`.\n"
+              },
+              {
+                "name": "period-end",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time."
+              },
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              },
+              {
+                "name": "static-only",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return limits determined by static ratings.  Without this parameter a\nforecast limits snapshot would include contain limits determined by\nconsidering dynamic ratings, like AARs or DLRs, when those were available for\na particular forecast period.\n\nWith `static-only=true`, the forecast limits snapshot would only include\nlimits that were determined using static ratings, such as seasonal ratings,\nseasonal overrides, temporary AAR exceptions, operator overrides, etc.\n"
+              },
+              {
+                "name": "temporal-resolution",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the time aggregation for the forecast using ISO 8601 Duration\nsyntax. If not provided, the API will default to hourly. Examples of values\nthat **may** be supported by a given implementation include:\n  * Hourly (default): PT1H\n  * Daily: P1D\n  * Weekly: P1W\n  * Monthly: P1M\n  * Yearly: P1Y\n  * Quarterly: P3M\n\nIf the API does not support the requested `temporal_resolution`, it will\nreturn a `422 Unprocessable Content` response.\n\nWhen this parameter is provided, both `offset-period-start` and `period-end`\nare required.\n\nGiven `temporal-resolution` **R**, `offset-period-start` **S**, and\n`period-end` **E**, both **S** and **E** must agree on each duration component\nto the right of (so smaller than) **R**. For example, this is a valid\ncombination:\n\n| parameter           | value                |\n| :---                | :---                 |\n| temporal-resolution | P1D (i.e. \"daily\")   |\n| offset-period-start | 2025-01-01T01:00:00Z |\n| period-end          | 2025-01-04T01:00:00Z |\n\nHowever, this is not valid because the hours do not agree:\n| parameter           | value                    |\n| :---                | :---                     |\n| temporal-resolution | P1D                      |\n| offset-period-start | 2025-01-01T**01**:10:00Z |\n| period-end          | 2025-01-04T**12**:00:00Z |\n\nNote that the minutes do not agree either, but that is essentially\ninconsequential since at the daily resolution the hours must first agree.\n\nAs discussed in their respective parameters, `offset-period-start` and\n`period-end` nominate the **beginning** of the first and **end** of the last period\n(interval), respectively. Given our valid example above, the first period in\nthe forecast would be for the 24-hours starting at `2025-01-01T01:00:00Z` and\nending at `2025-01-02T01:00:00Z`, and the final period would be for the\n24-hour period starting at `2025-01-03T01:00:00Z` and ending at\n`2025-01-04T01:00:00Z`.\n\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nReturns the latest Limits Forecast the clearinghouse has produced.\n\nThis content of the response varies significantly based on the media type requested.\n\n* `application/vnd.trolie.forecast-limits-snapshot.v1+json` simply includes the limits.\n* For use cases that require understanding *how* the limits were determined,\n  the media type `application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json`\n  is available; it contains the ratings proposals and other factors used to\n  generate the limit"
+        },
+        {
+          "info": {
+            "name": "Historical Limits Forecast Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/limits/forecast-snapshot/:period",
+            "params": [
+              {
+                "name": "offset-period-start",
+                "value": "",
+                "type": "query",
+                "description": "Rather than return the entire forecast from the beginning, i.e., the next operating period, instead return a subset of the forecast starting with the period starting at `offset-period-start`.\n"
+              },
+              {
+                "name": "period-end",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time."
+              },
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              },
+              {
+                "name": "static-only",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return limits determined by static ratings.  Without this parameter a\nforecast limits snapshot would include contain limits determined by\nconsidering dynamic ratings, like AARs or DLRs, when those were available for\na particular forecast period.\n\nWith `static-only=true`, the forecast limits snapshot would only include\nlimits that were determined using static ratings, such as seasonal ratings,\nseasonal overrides, temporary AAR exceptions, operator overrides, etc.\n"
+              },
+              {
+                "name": "temporal-resolution",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the time aggregation for the forecast using ISO 8601 Duration\nsyntax. If not provided, the API will default to hourly. Examples of values\nthat **may** be supported by a given implementation include:\n  * Hourly (default): PT1H\n  * Daily: P1D\n  * Weekly: P1W\n  * Monthly: P1M\n  * Yearly: P1Y\n  * Quarterly: P3M\n\nIf the API does not support the requested `temporal_resolution`, it will\nreturn a `422 Unprocessable Content` response.\n\nWhen this parameter is provided, both `offset-period-start` and `period-end`\nare required.\n\nGiven `temporal-resolution` **R**, `offset-period-start` **S**, and\n`period-end` **E**, both **S** and **E** must agree on each duration component\nto the right of (so smaller than) **R**. For example, this is a valid\ncombination:\n\n| parameter           | value                |\n| :---                | :---                 |\n| temporal-resolution | P1D (i.e. \"daily\")   |\n| offset-period-start | 2025-01-01T01:00:00Z |\n| period-end          | 2025-01-04T01:00:00Z |\n\nHowever, this is not valid because the hours do not agree:\n| parameter           | value                    |\n| :---                | :---                     |\n| temporal-resolution | P1D                      |\n| offset-period-start | 2025-01-01T**01**:10:00Z |\n| period-end          | 2025-01-04T**12**:00:00Z |\n\nNote that the minutes do not agree either, but that is essentially\ninconsequential since at the daily resolution the hours must first agree.\n\nAs discussed in their respective parameters, `offset-period-start` and\n`period-end` nominate the **beginning** of the first and **end** of the last period\n(interval), respectively. Given our valid example above, the first period in\nthe forecast would be for the 24-hours starting at `2025-01-01T01:00:00Z` and\nending at `2025-01-02T01:00:00Z`, and the final period would be for the\n24-hour period starting at `2025-01-03T01:00:00Z` and ending at\n`2025-01-04T01:00:00Z`.\n\n"
+              },
+              {
+                "name": "period",
+                "value": "",
+                "type": "path",
+                "description": "Returns the Forecast Limits snapshot for the period requested rather\nthan the current snapshot.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nObtain the Limits Forecast the Transmission Provider used or is currently\nusing in Operations as of the period requested.\n\nSee the [Limits Forecast Snapshot](#tag/Forecasting/operation/getLimitsForecastSnapshot)\noperation for more information.\n"
+        },
+        {
+          "info": {
+            "name": "Regional Limits Forecast Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/limits/regional/forecast-snapshot",
+            "params": [
+              {
+                "name": "offset-period-start",
+                "value": "",
+                "type": "query",
+                "description": "Rather than return the entire forecast from the beginning, i.e., the next operating period, instead return a subset of the forecast starting with the period starting at `offset-period-start`.\n"
+              },
+              {
+                "name": "period-end",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time."
+              },
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              },
+              {
+                "name": "static-only",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return limits determined by static ratings.  Without this parameter a\nforecast limits snapshot would include contain limits determined by\nconsidering dynamic ratings, like AARs or DLRs, when those were available for\na particular forecast period.\n\nWith `static-only=true`, the forecast limits snapshot would only include\nlimits that were determined using static ratings, such as seasonal ratings,\nseasonal overrides, temporary AAR exceptions, operator overrides, etc.\n"
+              },
+              {
+                "name": "temporal-resolution",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the time aggregation for the forecast using ISO 8601 Duration\nsyntax. If not provided, the API will default to hourly. Examples of values\nthat **may** be supported by a given implementation include:\n  * Hourly (default): PT1H\n  * Daily: P1D\n  * Weekly: P1W\n  * Monthly: P1M\n  * Yearly: P1Y\n  * Quarterly: P3M\n\nIf the API does not support the requested `temporal_resolution`, it will\nreturn a `422 Unprocessable Content` response.\n\nWhen this parameter is provided, both `offset-period-start` and `period-end`\nare required.\n\nGiven `temporal-resolution` **R**, `offset-period-start` **S**, and\n`period-end` **E**, both **S** and **E** must agree on each duration component\nto the right of (so smaller than) **R**. For example, this is a valid\ncombination:\n\n| parameter           | value                |\n| :---                | :---                 |\n| temporal-resolution | P1D (i.e. \"daily\")   |\n| offset-period-start | 2025-01-01T01:00:00Z |\n| period-end          | 2025-01-04T01:00:00Z |\n\nHowever, this is not valid because the hours do not agree:\n| parameter           | value                    |\n| :---                | :---                     |\n| temporal-resolution | P1D                      |\n| offset-period-start | 2025-01-01T**01**:10:00Z |\n| period-end          | 2025-01-04T**12**:00:00Z |\n\nNote that the minutes do not agree either, but that is essentially\ninconsequential since at the daily resolution the hours must first agree.\n\nAs discussed in their respective parameters, `offset-period-start` and\n`period-end` nominate the **beginning** of the first and **end** of the last period\n(interval), respectively. Given our valid example above, the first period in\nthe forecast would be for the 24-hours starting at `2025-01-01T01:00:00Z` and\nending at `2025-01-02T01:00:00Z`, and the final period would be for the\n24-hour period starting at `2025-01-03T01:00:00Z` and ending at\n`2025-01-04T01:00:00Z`.\n\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nSimilar to [getLimitsForecastSnapshot](#tag/Forecasting/operation/getLimitsForecastSnapshot),\nexcept that it specifically returns only the latest **regionally** limiting ratings\n([RLRs](https://trolie.energy/concepts#regionally-limiting-rating))\nused by the Transmission Provider.\n\nThis is explicitly designed to be used when reconciling forecasts between Transmission Providers\nin order to generate globally limiting ratings ([GLRs](https://trolie.energy/concepts#globally-limiting-rating))\nfor gen"
+        },
+        {
+          "info": {
+            "name": "Update Regional Limits Forecast Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://trolie.example.com/limits/regional/forecast-snapshot",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nUpdate the Regional Limits Forecast with a Regional Limits Forecast\nSnapshot from an adjacent Transmission Provider (Reliability Coordinator)\nthat does not conform to the TROLIE peering profile as described in\n[RC-to-RC Reconciliation](https://trolie.energy/articles/RC-to-RC-reconciliation.html).\n"
+        },
+        {
+          "info": {
+            "name": "Obtain forecast proposal status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/rating-proposals/forecast",
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nUsed to obtain the status of the Ratings Forecast proposal. The response is\nimplicitly restricted to the requesting Ratings Provider's obligation.\nAccordingly, the caller can use this endpoint to check the state of their\nproposal submission.\n\nNote that the same status object is returned for each\n`patchRatingForecastProposal`, so this endpoint may seem redundant. However,\nan anticipated use case for this `GET` endpoint is to support supervisor\nprocesses that are setup by the client to independen"
+        },
+        {
+          "info": {
+            "name": "Submit a Forecast Proposal",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://trolie.example.com/rating-proposals/forecast",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nIn every Forecast Window, a new area-wide Forecast Proposal is created on\nthe TROLIE server of the Clearinghouse Provider. Each Ratings Provider then\n`PATCH`es the area-wide proposal with the forecasts for their respective\nRatings Obligations. Any unmet Ratings Obligations will result in the\nClearinghouse Provider using an appropriate Recourse Rating for those unmet\nobligations.\n\nFor Ratings Providers with a natural split in their Ratings Obligations,\ne.g., geographic or control areas, the `PAT"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Real-Time",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Real-Time Proposals Status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/rating-proposals/realtime",
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nRetrieves the status of a real-time ratings proposal. The response is\nlimited to the requestor's current proposal.\n\nNote this status resource is also returned for each `postRealTimeProposal`\ncall.  The anticipated use case for this endpoint is to monitoring proposal\nsubmissions: Clients can use this operation to independently verify that\ntheir proposal submission process is functioning correctly. This is\nparticularly useful for scenarios where a separate monitoring job is set up\nto check the st"
+        },
+        {
+          "info": {
+            "name": "Submit Real-Time Rating Proposal",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://trolie.example.com/rating-proposals/realtime",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nSome Clearinghouse Providers will support real-time ratings submissions\nthrough this operation.\n\nThe API mechanics are different than forecasts, as there is no implicitly\ncreated time window to modify.  Ratings providers simply `POST` new values\nas they are measured and/or computed.\n\nRules for usage however are similar to forecasts; real-time proposals do not\nhave to contain every resource for which the Ratings Provider is\nresponsible.  Data may be broken into batches across the Rating Provider"
+        },
+        {
+          "info": {
+            "name": "Limits Real Time Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/limits/realtime-snapshot",
+            "params": [
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nObtain the System Operating Limits in-use by the Transmission Provider.\n\nClients SHOULD perform Conditional `GET` using the `If-None-Match` header\nand the `ETag` of a previous `GET` response to poll this endpoint. Rate\nlimiting is done on a per Ratings Provider basis, so requests from\nindependent clients used by the same provider count against the same quota.\n"
+        },
+        {
+          "info": {
+            "name": "Regional Limits Real Time Snapshot",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/limits/regional/realtime-snapshot",
+            "params": [
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nSimilar to [getRealTimeLimits](#tag/Real-Time/operation/getRealTimeLimits), \nexcept that it specifically returns only the latest **regionally** limiting ratings\n([RLRs](https://trolie.energy/concepts#regionally-limiting-rating))\nused by the Transmission Provider.  \n\nThis is explicitly designed to be used when reconciling real-time ratings between Transmission Providers\nin order to generate globally limiting ratings ([GLRs](https://trolie.energy/concepts#globally-limiting-rating)) \nfor general u"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Seasonal",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Seasonal Ratings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/seasonal-ratings/snapshot",
+            "params": [
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "resource-id",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this power system resource\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve the nominal and seasonal ratings."
+        },
+        {
+          "info": {
+            "name": "Obtain seasonal rating proposal status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/rating-proposals/seasonal",
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nUsed to obtain the status of the Seasonal Ratings proposal. The response is\nimplicitly restricted to the requesting Ratings Provider's obligation.\nAccordingly, the caller can use this endpoint to check the state of their\nproposal submission.\n\nNote that the same status object is returned for each\n`patchSeasonalRatingsProposal`, so this endpoint may seem redundant.\nHowever, an anticipated use case for this `GET` endpoint is to support\nsupervisor processes that are setup by the client to independe"
+        },
+        {
+          "info": {
+            "name": "Submit a Seasonal Ratings proposal",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://trolie.example.com/rating-proposals/seasonal",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nThis operation allows the Ratings Provider to provide a partial or complete\nupdates of their Seasonal Ratings that will be used by the Clearinghouse\nProvider to determine the Seasonal Ratings Schedule.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Seasonal Overrides",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Seasonal Overrides",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/seasonal-overrides",
+            "params": [
+              {
+                "name": "period-start",
+                "value": "",
+                "type": "query",
+                "description": "Defines the start of an applicable operating period.  \n"
+              },
+              {
+                "name": "period-end",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time."
+              },
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "segment",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this segment.  \n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nSearch for Seasonal Overrides.  Will return any Seasonal Overrides that overlap with the start/end period.  \n\nClients SHOULD perform Conditional `GET` using the `If-None-Match` header\nand the `ETag` of a previous `GET` response.\n"
+        },
+        {
+          "info": {
+            "name": "Create a new seasonal override\n",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://trolie.example.com/seasonal-overrides",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new seasonal override\n"
+        },
+        {
+          "info": {
+            "name": "Obtain a specific temporary seasonal rating by Id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/seasonal-overrides/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Obtain a specific temporary seasonal rating by Id."
+        },
+        {
+          "info": {
+            "name": "Updates an existing Seasonal override",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://trolie.example.com/seasonal-overrides/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Updates an existing Seasonal override"
+        },
+        {
+          "info": {
+            "name": "Delete a specific seasonal override by its Id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://trolie.example.com/seasonal-overrides/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete a specific seasonal override by its Id."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Temporary AAR Exceptions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Temporary AAR Exceptions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/temporary-aar-exceptions",
+            "params": [
+              {
+                "name": "period-start",
+                "value": "",
+                "type": "query",
+                "description": "Defines the start of an applicable operating period.  \n"
+              },
+              {
+                "name": "period-end",
+                "value": "",
+                "type": "query",
+                "description": "Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time."
+              },
+              {
+                "name": "monitoring-set",
+                "value": "",
+                "type": "query",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              },
+              {
+                "name": "segment",
+                "value": "",
+                "type": "query",
+                "description": "Only return limits for this segment.  \n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Search for Temporary AAR Exceptions.  Will return any Temporary AAR Exceptions that overlap with the  start/end period.  \nClients SHOULD perform Conditional `GET` using the `If-None-Match` header and the `ETag` of a previous `GET` response.\n"
+        },
+        {
+          "info": {
+            "name": "Create a new temporary AAR Exception",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://trolie.example.com/temporary-aar-exceptions",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new temporary AAR Exception"
+        },
+        {
+          "info": {
+            "name": "Obtain a specific temporary AAR exception by Id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/temporary-aar-exceptions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Obtain a specific temporary AAR exception by Id."
+        },
+        {
+          "info": {
+            "name": "Updates an existing Temporary AAR Exception.",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://trolie.example.com/temporary-aar-exceptions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Updates an existing Temporary AAR Exception."
+        },
+        {
+          "info": {
+            "name": "Delete a specific temporary AAR Exception by Id.",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://trolie.example.com/temporary-aar-exceptions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Opaque identifier for the object. Format of this identifier may\nvery depending on the implementation.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete a specific temporary AAR Exception by Id."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Monitoring Sets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new monitoring set",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://trolie.example.com/monitoring-sets",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nCreate a new monitoring set. The server will assign a unique identifier and\nsource info to the monitoring set upon creation. This information will be\navailable in the monitoring set `source` header and in the HTTP `Location`\nheader.\n\nA 409 Conflict may be returned depending on the implementation. For example,\nif the monitoring set id that would be generated conflicts with an existing\nmonitoring set, as could be the case if the id was generated by the client.\nAs another example, a provided `alte"
+        },
+        {
+          "info": {
+            "name": "Obtain a specific monitoring set by identifier.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/monitoring-sets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Obtain a specific monitoring set by identifier."
+        },
+        {
+          "info": {
+            "name": "Update an existing monitoring set",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://trolie.example.com/monitoring-sets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nUpdate an existing monitoring set.\nReturns 403 Forbidden if the monitoring set is read-only.\nReturns 404 Not Found if the monitoring set does not exist or the principal\ndoes not have read access to it.\n\nA 409 Conflict may be returned depending on the implementation. For example,\na provided `alternate-identifiers` entry may conflict with existing\nidentifiers.\n\nA 422 Unprocessable Entity may be returned if the request body is\nsemantically invalid. For example, if any of the power system resources"
+        },
+        {
+          "info": {
+            "name": "Delete a specific monitoring set by its identifier",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://trolie.example.com/monitoring-sets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "\nOnly return ratings or limits for facilities of the associated\n`monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,\nbut using the NERC id of the associated Ratings Provider for the default\nmonitoring set is recommended.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nDelete a specific monitoring set by its identifier. Returns 403 Forbidden if\nthe monitoring set is read-only. Returns 404 Not Found if the monitoring set\ndoes not exist or the principal does not have read access to it.  Returns\n409 Conflict if the monitoring set cannot be deleted, for example, if it is\ncurrently the authenticated principal's default monitoring set.\n"
+        },
+        {
+          "info": {
+            "name": "Obtain your default monitoring set.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://trolie.example.com/default-monitoring-set",
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://no-server/oauth2",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "\nObtain the default monitoring set for the authorized principal.  TROLIE\nimplementations SHOULD provide a default monitoring set for each principal.\nThe default monitoring set is the monitoring set that is used for limits\nsnapshots when the `monitoring-set-id` query parameter is not supplied.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
