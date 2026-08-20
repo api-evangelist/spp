@@ -185,6 +185,11 @@ apis:
   tags:
   - SOAP
   - Wholesale Markets
+  - Settlement
+  - Gated
+  tags_raw:
+  - SOAP
+  - Wholesale Markets
   - Settlements
   - Gated
   properties:
