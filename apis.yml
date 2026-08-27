@@ -55,13 +55,12 @@ apis:
 - aid: spp:spp-public-data-ftp
   name: SPP Public Data FTP
   description: >-
-    SPP's officially documented programmatic interface to its public data. The SPP
-    Public Data Access guide (v3.0, July 2023) names FTP as the programmatic access
-    path for Integrated Marketplace, Western Reliability Coordination and WEIS public
-    data. Verified anonymously on 2026-07-27: a listing returned FTP status 226 with
-    top-level directories including Markets, Operational_Data, Operations_Reports,
-    Settlements, Reliability, TCR, Market_Monitoring and West_EIS. No account, key or
-    licence agreement is required.
+    SPP's officially documented programmatic interface to its public data. The SPP Public Data Access
+    guide (v3.0, July 2023) names FTP as the programmatic access path for Integrated Marketplace, Western
+    Reliability Coordination and WEIS public data. Verified anonymously on 2026-07-27: a listing returned
+    FTP status 226 with top-level directories including Markets, Operational_Data, Operations_Reports,
+    Settlements, Reliability, TCR, Market_Monitoring and West_EIS. No account, key or licence agreement
+    is required.
   humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
   baseURL: ftp://pubftp.spp.org
   tags:
@@ -76,15 +75,14 @@ apis:
 - aid: spp:spp-portal-file-browser-api
   name: SPP Portal Public Data File Browser API
   description: >-
-    The HTTP download service behind the SPP Portal public data pages. Anonymous GET
-    requests of the form /file-browser-api/download/{dataset}?path={file} return CSV
-    for real-time balancing market LMP by settlement location, real-time and day-ahead
-    market clearing prices, operating reserves, hourly load, historical generation mix,
-    VER curtailments, capacity of generation on outage, and the WEIS market equivalents.
-    Eight dataset paths were confirmed HTTP 200 with content-type text/csv on 2026-07-27
-    with no credentials. SPP documents the datasets and file formats in its Markets
-    Public Data Guide but does not publish this HTTP path as a supported interface
-    specification — FTP is the interface SPP formally supports.
+    The HTTP download service behind the SPP Portal public data pages. Anonymous GET requests of the form
+    /file-browser-api/download/{dataset}?path={file} return CSV for real-time balancing market LMP by
+    settlement location, real-time and day-ahead market clearing prices, operating reserves, hourly load,
+    historical generation mix, VER curtailments, capacity of generation on outage, and the WEIS market
+    equivalents. Eight dataset paths were confirmed HTTP 200 with content-type text/csv on 2026-07-27
+    with no credentials. SPP documents the datasets and file formats in its Markets Public Data Guide
+    but does not publish this HTTP path as a supported interface specification — FTP is the interface
+    SPP formally supports.
   humanURL: https://portal.spp.org/pages/rtbm-lmp-by-location
   baseURL: https://portal.spp.org/file-browser-api/download
   tags:
@@ -106,12 +104,10 @@ apis:
 - aid: spp:spp-portal-chart-api
   name: SPP Portal Chart API
   description: >-
-    JSON and CSV chart feeds serving the SPP Portal dashboards. Confirmed anonymously
-    on 2026-07-27: /chart-api/gen-mix/asChart and /chart-api/load-forecast/asChart
-    return application/json with labelled hourly datasets by fuel type and load
-    forecast series, and /chart-api/gen-mix-365/asFile returns a rolling 365-day
-    generation mix CSV. Undocumented as a formal interface specification; served
-    without authentication.
+    JSON and CSV chart feeds serving the SPP Portal dashboards. Confirmed anonymously on 2026-07-27: /chart-api/gen-mix/asChart
+    and /chart-api/load-forecast/asChart return application/json with labelled hourly datasets by fuel
+    type and load forecast series, and /chart-api/gen-mix-365/asFile returns a rolling 365-day generation
+    mix CSV. Undocumented as a formal interface specification; served without authentication.
   humanURL: https://portal.spp.org/pages/generation-mix-historical
   baseURL: https://portal.spp.org/chart-api
   tags:
@@ -124,11 +120,10 @@ apis:
 - aid: spp:spp-price-contour-map-arcgis
   name: SPP Price Contour Map ArcGIS REST Services
   description: >-
-    An Esri ArcGIS Server REST directory serving the geospatial layers behind SPP's
-    price contour map. Confirmed anonymously on 2026-07-27 at ArcGIS 11.5: the service
-    root returned JSON listing the PCM and Utilities folders, and the PCM folder listed
-    DA_Features, DA_LMP, DELTA_Features, DELTA_LMP, RTBM_Features, RTBM_LMP, States and
-    Transmission MapServer services. Follows the standard Esri ArcGIS REST API contract
+    An Esri ArcGIS Server REST directory serving the geospatial layers behind SPP's price contour map.
+    Confirmed anonymously on 2026-07-27 at ArcGIS 11.5: the service root returned JSON listing the PCM
+    and Utilities folders, and the PCM folder listed DA_Features, DA_LMP, DELTA_Features, DELTA_LMP, RTBM_Features,
+    RTBM_LMP, States and Transmission MapServer services. Follows the standard Esri ArcGIS REST API contract
     (?f=json), not an SPP-authored specification.
   humanURL: https://pricecontourmap.spp.org/arcgis/rest/services
   baseURL: https://pricecontourmap.spp.org/arcgis/rest/services
@@ -140,48 +135,18 @@ apis:
   properties:
   - type: APIReference
     url: https://pricecontourmap.spp.org/arcgis/rest/services?f=json
-- aid: spp:spp-lep-trolie-api
-  name: SPP LEP/TROLIE Ratings API
-  description: >-
-    SPP's REST implementation of GE Vernova's Limit Exchange Portal (LEP) using the
-    LF Energy TROLIE (Transmission Ratings and Operating Limits Information Exchange)
-    API specification, built to meet FERC Order 881 ambient-adjusted ratings
-    obligations. SPP published a versioned Data Exchange Guide (v1.0, 8 Nov 2024)
-    covering monitoring sets, forecast ratings, real-time ratings and seasonal ratings.
-    No production base URL is published — SPP's own guide uses the placeholder
-    https://<baseURL>/ throughout — and access requires an x.509 digital certificate
-    from a CA SPP trusts plus a role assigned in SPP UAA. Not verifiable anonymously.
-  humanURL: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
-  tags:
-  - Transmission
-  - Ratings
-  - TROLIE
-  - FERC Order 881
-  - Gated
-  properties:
-  - type: Documentation
-    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
-  - type: OpenAPI
-    url: openapi/trolie-standard-openapi.yml
-  - type: Specification
-    url: https://trolie.energy/spec
-  - type: Overlay
-    url: overlays/spp-trolie-standard-overlay.yaml
-  - type: AgentSkill
-    name: Exchange transmission ratings with SPP (LEP/TROLIE)
-    url: skills/spp-trolie-ratings-exchange.md
 - aid: spp:spp-integrated-marketplace-web-services
   name: SPP Integrated Marketplace Markets Web Service
   description: >-
-    The SOAP web and notification services market participants use to submit offers and
-    bids and retrieve results from the SPP Integrated Marketplace, with WEIS Markets Web
-    Service as the western equivalent and the Settlement Management System API for
-    settlements. SPP's System Interfaces Stakeholder Reference Guide (v1.0, 29 Jan 2025)
-    names these as SOAP and REST services over HTTPS requiring two-factor authentication;
-    the Markets+ platform is stated to move to RESTful APIs. WSDLs, XSDs and endpoint
-    URLs are published only inside the member-facing Change User Forum technical
-    reference documents and were not retrievable anonymously; no base URL is public.
-  humanURL: https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
+    The SOAP web and notification services market participants use to submit offers and bids and retrieve
+    results from the SPP Integrated Marketplace, with WEIS Markets Web Service as the western equivalent
+    and the Settlement Management System API for settlements. SPP's System Interfaces Stakeholder Reference
+    Guide (v1.0, 29 Jan 2025) names these as SOAP and REST services over HTTPS requiring two-factor authentication;
+    the Markets+ platform is stated to move to RESTful APIs. WSDLs, XSDs and endpoint URLs are published
+    only inside the member-facing Change User Forum technical reference documents and were not retrievable
+    anonymously; no base URL is public.
+  humanURL: >-
+    https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
   tags:
   - SOAP
   - Wholesale Markets
@@ -194,12 +159,211 @@ apis:
   - Gated
   properties:
   - type: Documentation
-    url: https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
+    url: >-
+      https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf
   - type: Documentation
     url: https://www.spp.org/stakeholder-center/user-guides-apis-integrations/
   - type: Documentation
-    url: https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
+    url: >-
+      https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf
+- aid: spp:spp-forecasting-api
+  name: Southwest Power Pool Forecasting API
+  description: >-
+    The Forecasting API operations define the exchange of forecasted ratings,
+
+    including the 240-hour-ahead forecasted AAR data exchange required by FERC
+
+    Order 881.  The operations support submitting rating proposals, querying
+
+    in-use limits, and monitoring the health and validity of submissions
+
+    against the Rating Provider's obligations.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Forecasting
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-forecasting-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-monitoring-sets-api
+  name: Southwest Power Pool Monitoring Sets API
+  description: >-
+    [Monitoring Sets](https://trolie.energy/concepts#monitoring-sets) are
+
+    named sets of power system resources that may be used to filter ratings
+
+    and limits returned by queries against these APIs. How Monitoring Sets are
+
+    defined is beyond the scope of the TROLIE specification, and it is assumed
+
+    that the sender and receiver have predefined the appropriate Monitoring
+
+    Sets.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Monitoring Sets
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-monitoring-sets-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-real-time-api
+  name: Southwest Power Pool Real Time API
+  description: >-
+    If permitted by the Clearinghouse Provider, its Ratings Providers can use
+
+    these functions to exchange real-time ratings, supplementing or replacing
+
+    traditional telemetry protocols like ICCP.
+
+
+    These ratings are based on real-time measurements of ambient conditions
+
+    and will be used by Transmission Providers for real-time grid operations
+
+    processes, including state estimation and real-time markets.  The clearing
+
+    of real-time ratings may be more frequent than for forecast ratings, but
+
+    the frequency is the prerogative of the Clearinghouse Provider.
+
+
+    These ratings may be either AARs or DLRs.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Real-Time
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-real-time-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-seasonal-api
+  name: Southwest Power Pool Seasonal API
+  description: >-
+    Seasonal ratings are static ratings associated with extended durations,
+
+    typically months. These are typically used in both planning and
+
+    operations.
+
+
+    Power system resources that are exempt from providing AARs generally
+
+    operate at a seasonal rating. Even for resources using dynamic ratings, a
+
+    seasonal rating is still necessary. This acts as a recourse when a dynamic
+
+    rating is unavailable.  For example, a dynamic rating
+
+    might be unavailable during communication outages or for forecasts beyond
+
+    the ten-day period required by FERC Order 881.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Seasonal
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-seasonal-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-seasonal-overrides-api
+  name: Southwest Power Pool Seasonal Overrides API
+  description: >-
+    A Seasonal Override instructs the system to use a temporary static rating
+
+    instead of any concurrent Seasonal Rating for a resource.
+
+
+    A typical use case is a so-called 'de-rate' due to a temporary clearance
+
+    issue for a transmission facility that is exempt from providing AARs.
+
+
+    Exempt facilities typically operate at a seasonal rating. However, instead
+
+    of updating the seasonal rating schedule, a Ratings Provider can send a
+
+    Seasonal Override.
+
+
+    During the override period, the Clearinghouse uses the Seasonal
+
+    Override rating instead of any scheduled seasonal ratings.
+
+
+    For resources required to provide AARs, a Ratings Provider would issue a
+
+    Temporary AAR Exception to address temporary conditions requiring a static
+
+    rating.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Seasonal Overrides
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-seasonal-overrides-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-temporary-aar-exceptions-api
+  name: Southwest Power Pool Temporary AAR Exceptions API
+  description: "A [Temporary AAR Exception](https://trolie.energy/concepts#temporary-aar-exception) is\n\
+    provided by the Ratings Provider when a Ratings Obligation cannot be\nfulfilled, due to some temporary\
+    \ operating condition impacting the related\npower system resource.  This could occur in various scenarios:\n\
+    \n  * An equipment failure.\n  * An unforeseen condition on a related part of the power grid.\n  *\
+    \ Some ambient condition that is not part of the model is heating the\n    line, like a wildfire.\n\
+    \  * Something in the surrounding environment is affecting the amount that a\n    line is allowed\
+    \ to sag. For example, this may occur for lines over\n    rivers when very large ships pass under\
+    \ them\n\nA Temporary AAR Exception serves two main purposes: documenting the reason\nfor the exception\
+    \ and providing a temporary rating value set. It is employed\nin three distinct circumstances:\n\n\
+    1. Firstly, Order 881 mandates documentation and archival of all use of\n alternate ratings in lieu\
+    \ of AARs. Ratings Providers should continue to\n provide real-time and forecast ratings for the affected\
+    \ resource, but\n these should match the rating provided with the Temporary AAR Exception\n while\
+    \ the latter is in effect. This temporary rating, and the reason that\n it occurred, must be captured\
+    \ in history regardless of the provided\n ratings.  The reason and the end date of the effective window\
+    \ may be\n updated after the object has been created, up to a configurable threshold.\n\n   If the\
+    \ Ratings Providers provides ratings that deviate from the static\n   Temporary AAR Exception rating,\
+    \ the Clearinghouse Provider must decide\n   whether to use those or the static rating. The Clearinghouse\
+    \ Provider\n   advise its Ratings Providers on how it will choose ahead of time. This\n   specification\
+    \ recommends using the dynamic rating provided, but it does\n   not mandate it.\n\n2. Secondly, Temporary\
+    \ AAR Exceptions apply when the Clearinghouse\n  Provider is generating forecast rating proposals\
+    \ on behalf of the Ratings Provider, e.g., when lookup tables are provided ahead of time by the Ratings\
+    \ Provider.\n  Since there is no external ratings, the Clearinghouse Provider\n  wouldn't otherwise\
+    \ know that a temporary static rating is needed. \n\n3. Finally, for facilities where dynamic ratings\
+    \ are provided, it is\n  possible that a communications outage or other issue could prevent the\n\
+    \  Clearinghouse Provider from receiving the dynamic ratings. In this case,\n  the Clearinghouse Provider\
+    \ would use a Temporary AAR Exception rating."
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Temporary AAR Exceptions
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-temporary-aar-exceptions-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
 common:
+- type: Overlay
+  url: overlays/spp-trolie-standard-overlay.yaml
+- type: AgentSkill
+  url: skills/spp-trolie-ratings-exchange.md
 - type: DomainSecurity
   url: security/spp-domain-security.yml
 - type: OAuthScopes
