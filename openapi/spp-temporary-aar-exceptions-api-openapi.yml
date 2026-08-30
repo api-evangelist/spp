@@ -1,0 +1,1305 @@
+openapi: 3.2.0
+info:
+  title: Transmission Ratings and Operating Limits Information Exchange (TROLIE) Temporary AAR Exceptions API
+  x-logo:
+    altText: TROLIE logo
+    url: images/TROLIE-horizontal-color.svg
+  description: "\nThis specification defines a set of operations for the exchange of power\nsystem ratings and limits between entities that own and operate the electric\npower system in North America. In particular, it is designed to support the\nexchange of Ambient Adjusted Ratings (AARs), pursuant to FERC Order 881.  It\nis published as a community standard to facilitate interoperability\nin these exchanges.\n\nThe specification conceives of the exchange as being between two primary\nentities:\n\n* A [Ratings Provider](https://trolie.energy/concepts#ratings-provider) is\n an entity that is responsible for providing ratings on some set of power\n system resources, e.g., Transmission Facilities, typically a Transmission\n Owner or Transmission Operator.  The ratings are provided to a\n Clearinghouse Provider whose is responsible for determining the operating\n limits of the power system resources.\n\n* The [Clearinghouse Provider](https://trolie.energy/concepts#clearinghouse-provider) is\n  typically a Transmission Provider (FERC) and a Reliability Coordinator (NERC).\n\nAdjacent Clearinghouse Providers exchange ratings in order to establish\noperating limit values for the power system resources that are shared\nbetween them.\n\nA Ratings Provider is assumed by this specification to have pre-coordinated \nwith a Clearinghouse Provider to identify the former's Ratings Obligation,\ni.e., the set of power system resources for which they will provide ratings.\nAdditionally, the Ratings Provider will have similarly pre-coordinated the\ndefinition of their Monitoring Sets, i.e., their power system limits of\ninterest. The nature and method of pre-coordination is out-of-scope for this\nspecification.\n\nNote that this API makes a strict distinction between the terms rating and\nlimit.  Colloquially, these terms are often used interchangeably.  However,\nin the context of this specification, they have distinct meanings. At a\nhigh-level, the specification defines an exchange where ratings go in and\nlimits come out. A Clearinghouse is a function for determining the operating\nlimits from the ratings it has on-hand, including those that are proposed by\nRatings Providers and any applicable time-bound static ratings.\n\nThis interaction diagram highlights the primary requests and responses that\nare defined in this spec. Note that not all of the operations will be\nsupported by every implementation.\n\n<img src=\"images/interactions.excalidraw.png\" alt=\"Primary Interactions with Ratings Provider\" />\n"
+  version: 1.1.0
+  contact:
+    name: TROLIE Maintainers
+    email: maintainers@trolie.energy
+    url: https://trolie.energy
+  license:
+    name: Community Specification License 1.0
+    url: https://spdx.org/licenses/Community-Spec-1.0.html
+servers:
+- url: https://trolie.example.com
+security:
+- oauth2-primary-flow: []
+tags:
+- name: Temporary AAR Exceptions
+  description: "A [Temporary AAR Exception](https://trolie.energy/concepts#temporary-aar-exception) is\nprovided by the Ratings Provider when a Ratings Obligation cannot be\nfulfilled, due to some temporary operating condition impacting the related\npower system resource.  This could occur in various scenarios:\n\n  * An equipment failure.\n  * An unforeseen condition on a related part of the power grid.\n  * Some ambient condition that is not part of the model is heating the\n    line, like a wildfire.\n  * Something in the surrounding environment is affecting the amount that a\n    line is allowed to sag. For example, this may occur for lines over\n    rivers when very large ships pass under them\n\nA Temporary AAR Exception serves two main purposes: documenting the reason\nfor the exception and providing a temporary rating value set. It is employed\nin three distinct circumstances:\n\n1. Firstly, Order 881 mandates documentation and archival of all use of\n alternate ratings in lieu of AARs. Ratings Providers should continue to\n provide real-time and forecast ratings for the affected resource, but\n these should match the rating provided with the Temporary AAR Exception\n while the latter is in effect. This temporary rating, and the reason that\n it occurred, must be captured in history regardless of the provided\n ratings.  The reason and the end date of the effective window may be\n updated after the object has been created, up to a configurable threshold.\n\n   If the Ratings Providers provides ratings that deviate from the static\n   Temporary AAR Exception rating, the Clearinghouse Provider must decide\n   whether to use those or the static rating. The Clearinghouse Provider\n   advise its Ratings Providers on how it will choose ahead of time. This\n   specification recommends using the dynamic rating provided, but it does\n   not mandate it.\n\n2. Secondly, Temporary AAR Exceptions apply when the Clearinghouse\n  Provider is generating forecast rating proposals on behalf of the Ratings Provider, e.g., when lookup tables are provided ahead of time by the Ratings Provider.\n  Since there is no external ratings, the Clearinghouse Provider\n  wouldn't otherwise know that a temporary static rating is needed. \n\n3. Finally, for facilities where dynamic ratings are provided, it is\n  possible that a communications outage or other issue could prevent the\n  Clearinghouse Provider from receiving the dynamic ratings. In this case,\n  the Clearinghouse Provider would use a Temporary AAR Exception rating.\n"
+paths:
+  /temporary-aar-exceptions:
+    get:
+      operationId: getTemporaryAARExceptions
+      description: "Search for Temporary AAR Exceptions.  Will return any Temporary AAR Exceptions that overlap with the  start/end period.  \nClients SHOULD perform Conditional `GET` using the `If-None-Match` header and the `ETag` of a previous `GET` response.\n"
+      summary: Temporary AAR Exceptions
+      tags:
+      - Temporary AAR Exceptions
+      parameters:
+      - $ref: '#/components/parameters/period-start-query'
+      - $ref: '#/components/parameters/period-end'
+      - $ref: '#/components/parameters/query-filter'
+      - $ref: '#/components/parameters/segment-filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.trolie.temporary-aar-exception-set.v1+json:
+              schema:
+                $ref: '#/components/schemas/temporary-aar-exception-set'
+              example:
+              - source:
+                  provider: X-AMPL
+                  last-updated: '2023-07-12T15:05:43.044267100-07:00'
+                  origin-id: //trolie.example.com/temporary-aar-exceptions/46f7212b-1633-4c30-ba71-c6e987b2ded7
+                id: 46f7212b-1633-4c30-ba71-c6e987b2ded7
+                resource:
+                  resource-id: 8badf00d
+                  alternate-identifiers:
+                  - name: segmentX
+                    authority: TO-NERC-ID
+                  - name: LINE1 SEG-X
+                    authority: RC-NERC-ID
+                    mrid: 8badf00d
+                start-time: '2025-07-12T16:00:00-07:00'
+                end-time: '2025-07-13T12:00:00-07:00'
+                continuous-operating-limit:
+                  mva: 160
+                emergency-operating-limits:
+                - duration-name: emergency
+                  limit:
+                    mva: 165
+                - duration-name: load-shed
+                  limit:
+                    mva: 170
+                reason: High wildfire risk forecasted until mid-day 7/13/25
+          headers:
+            X-Rate-Limit-Limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
+            X-Rate-Limit-Remaining:
+              $ref: '#/components/headers/X-Rate-Limit-Remaining'
+            X-Rate-Limit-Reset:
+              $ref: '#/components/headers/X-Rate-Limit-Reset'
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '304':
+          $ref: '#/components/responses/304'
+        '400':
+          $ref: '#/components/responses/400-problem'
+        '401':
+          $ref: '#/components/responses/401-empty'
+        '403':
+          $ref: '#/components/responses/403-empty'
+        '404':
+          $ref: '#/components/responses/404-empty'
+        '406':
+          $ref: '#/components/responses/406-problem'
+        '429':
+          $ref: '#/components/responses/429-empty'
+        '500':
+          $ref: '#/components/responses/500-empty'
+        default:
+          $ref: '#/components/responses/500-empty'
+      security:
+      - oauth2-primary-flow:
+        - read:temporary-aar-exceptions
+    post:
+      operationId: createTemporaryAARException
+      description: Create a new temporary AAR Exception
+      summary: Create a new temporary AAR Exception
+      tags:
+      - Temporary AAR Exceptions
+      requestBody:
+        required: true
+        content:
+          application/vnd.trolie.temporary-aar-exception.v1+json:
+            schema:
+              $ref: '#/components/schemas/temporary-aar-exception-request'
+            example:
+              source:
+                provider: X-AMPL
+                last-updated: '2023-07-12T15:05:43.044267100-07:00'
+                origin-id: //trolie.example.com/temporary-aar-exceptions/46f7212b-1633-4c30-ba71-c6e987b2ded7
+              resource:
+                resource-id: 8badf00d
+                alternate-identifiers:
+                - name: segmentX
+                  authority: TO-NERC-ID
+                - name: LINE1 SEG-X
+                  authority: RC-NERC-ID
+                  mrid: 8badf00d
+              start-time: '2025-07-12T16:00:00-07:00'
+              end-time: '2025-07-13T12:00:00-07:00'
+              continuous-operating-limit:
+                mva: 160
+              emergency-operating-limits:
+              - duration-name: emergency
+                limit:
+                  mva: 165
+              - duration-name: load-shed
+                limit:
+                  mva: 170
+              reason: High wildfire risk forecasted until mid-day 7/13/25
+      responses:
+        '201':
+          description: The temporary AAR Exception was created.
+          content:
+            application/vnd.trolie.temporary-aar-exception.v1+json:
+              schema:
+                $ref: '#/components/schemas/temporary-aar-exception'
+              example:
+                source:
+                  provider: X-AMPL
+                  last-updated: '2023-07-12T15:05:43.044267100-07:00'
+                  origin-id: //trolie.example.com/temporary-aar-exceptions/46f7212b-1633-4c30-ba71-c6e987b2ded7
+                id: 46f7212b-1633-4c30-ba71-c6e987b2ded7
+                resource:
+                  resource-id: 8badf00d
+                  alternate-identifiers:
+                  - name: segmentX
+                    authority: TO-NERC-ID
+                  - name: LINE1 SEG-X
+                    authority: RC-NERC-ID
+                    mrid: 8badf00d
+                start-time: '2025-07-12T16:00:00-07:00'
+                end-time: '2025-07-13T12:00:00-07:00'
+                continuous-operating-limit:
+                  mva: 160
+                emergency-operating-limits:
+                - duration-name: emergency
+                  limit:
+                    mva: 165
+                - duration-name: load-shed
+                  limit:
+                    mva: 170
+                reason: High wildfire risk forecasted until mid-day 7/13/25
+          headers:
+            X-Rate-Limit-Limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
+            X-Rate-Limit-Remaining:
+              $ref: '#/components/headers/X-Rate-Limit-Remaining'
+            X-Rate-Limit-Reset:
+              $ref: '#/components/headers/X-Rate-Limit-Reset'
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              $ref: '#/components/headers/Location'
+        '400':
+          $ref: '#/components/responses/400-problem'
+        '401':
+          $ref: '#/components/responses/401-empty'
+        '403':
+          $ref: '#/components/responses/403-empty'
+        '404':
+          $ref: '#/components/responses/404-empty'
+        '406':
+          $ref: '#/components/responses/406-problem'
+        '413':
+          $ref: '#/components/responses/413-empty'
+        '415':
+          $ref: '#/components/responses/415-problem'
+        '422':
+          $ref: '#/components/responses/422-problem'
+        '429':
+          $ref: '#/components/responses/429-empty'
+        '500':
+          $ref: '#/components/responses/500-empty'
+        default:
+          $ref: '#/components/responses/500-empty'
+      security:
+      - oauth2-primary-flow:
+        - write:temporary-aar-exceptions
+  /temporary-aar-exceptions/{id}:
+    get:
+      operationId: getTemporaryAARException
+      description: Obtain a specific temporary AAR exception by Id.
+      summary: Obtain a specific temporary AAR exception by Id.
+      tags:
+      - Temporary AAR Exceptions
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.trolie.temporary-aar-exception.v1+json:
+              schema:
+                $ref: '#/components/schemas/temporary-aar-exception'
+              example:
+                source:
+                  provider: X-AMPL
+                  last-updated: '2023-07-12T15:05:43.044267100-07:00'
+                  origin-id: //trolie.example.com/temporary-aar-exceptions/46f7212b-1633-4c30-ba71-c6e987b2ded7
+                id: 46f7212b-1633-4c30-ba71-c6e987b2ded7
+                resource:
+                  resource-id: 8badf00d
+                  alternate-identifiers:
+                  - name: segmentX
+                    authority: TO-NERC-ID
+                  - name: LINE1 SEG-X
+                    authority: RC-NERC-ID
+                    mrid: 8badf00d
+                start-time: '2025-07-12T16:00:00-07:00'
+                end-time: '2025-07-13T12:00:00-07:00'
+                continuous-operating-limit:
+                  mva: 160
+                emergency-operating-limits:
+                - duration-name: emergency
+                  limit:
+                    mva: 165
+                - duration-name: load-shed
+                  limit:
+                    mva: 170
+                reason: High wildfire risk forecasted until mid-day 7/13/25
+          headers:
+            X-Rate-Limit-Limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
+            X-Rate-Limit-Remaining:
+              $ref: '#/components/headers/X-Rate-Limit-Remaining'
+            X-Rate-Limit-Reset:
+              $ref: '#/components/headers/X-Rate-Limit-Reset'
+            ETag:
+              $ref: '#/components/headers/ETag'
+        '304':
+          $ref: '#/components/responses/304'
+        '400':
+          $ref: '#/components/responses/400-problem'
+        '401':
+          $ref: '#/components/responses/401-empty'
+        '403':
+          $ref: '#/components/responses/403-empty'
+        '404':
+          $ref: '#/components/responses/404-empty'
+        '406':
+          $ref: '#/components/responses/406-problem'
+        '410':
+          $ref: '#/components/responses/410-problem'
+        '429':
+          $ref: '#/components/responses/429-empty'
+        '500':
+          $ref: '#/components/responses/500-empty'
+        default:
+          $ref: '#/components/responses/500-empty'
+      security:
+      - oauth2-primary-flow:
+        - read:temporary-aar-exceptions
+    delete:
+      operationId: deleteTemporaryAARException
+      description: Delete a specific temporary AAR Exception by Id.
+      summary: Delete a specific temporary AAR Exception by Id.
+      tags:
+      - Temporary AAR Exceptions
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400-problem'
+        '401':
+          $ref: '#/components/responses/401-empty'
+        '403':
+          $ref: '#/components/responses/403-empty'
+        '404':
+          $ref: '#/components/responses/404-empty'
+        '409':
+          description: Temporary AAR Exceptions already employed in Operations cannot be deleted.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/problem'
+              example:
+                type: //trolie.example.com/spec/client-errors/409/temporary-aar-exception-in-use
+                title: 'Conflict: Temporary AAR Exception in Use'
+                status: 409
+                detail: Temporary AAR Exception with id 'fb06e551-37a8-4a98-8c97-fded702530d6' may not be deleted, as it has been used in rating snapshots and is now part of the record.
+          headers:
+            X-Rate-Limit-Limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
+            X-Rate-Limit-Remaining:
+              $ref: '#/components/headers/X-Rate-Limit-Remaining'
+            X-Rate-Limit-Reset:
+              $ref: '#/components/headers/X-Rate-Limit-Reset'
+        '429':
+          $ref: '#/components/responses/429-empty'
+        '500':
+          $ref: '#/components/responses/500-empty'
+        default:
+          $ref: '#/components/responses/500-empty'
+      security:
+      - oauth2-primary-flow:
+        - write:temporary-aar-exceptions
+    put:
+      operationId: updateTemporaryAARException
+      description: Updates an existing Temporary AAR Exception.
+      summary: Updates an existing Temporary AAR Exception.
+      tags:
+      - Temporary AAR Exceptions
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/vnd.trolie.temporary-aar-exception.v1+json:
+            schema:
+              $ref: '#/components/schemas/temporary-aar-exception'
+            example:
+              source:
+                provider: X-AMPL
+                last-updated: '2023-07-12T15:05:43.044267100-07:00'
+                origin-id: //trolie.example.com/temporary-aar-exceptions/46f7212b-1633-4c30-ba71-c6e987b2ded7
+              id: 46f7212b-1633-4c30-ba71-c6e987b2ded7
+              resource:
+                resource-id: 8badf00d
+                alternate-identifiers:
+                - name: segmentX
+                  authority: TO-NERC-ID
+                - name: LINE1 SEG-X
+                  authority: RC-NERC-ID
+                  mrid: 8badf00d
+              start-time: '2025-07-12T16:00:00-07:00'
+              end-time: '2025-07-13T12:00:00-07:00'
+              continuous-operating-limit:
+                mva: 160
+              emergency-operating-limits:
+              - duration-name: emergency
+                limit:
+                  mva: 165
+              - duration-name: load-shed
+                limit:
+                  mva: 170
+              reason: High wildfire risk forecasted until mid-day 7/13/25
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400-problem'
+        '401':
+          $ref: '#/components/responses/401-empty'
+        '403':
+          $ref: '#/components/responses/403-empty'
+        '404':
+          $ref: '#/components/responses/404-empty'
+        '406':
+          $ref: '#/components/responses/406-problem'
+        '413':
+          $ref: '#/components/responses/413-empty'
+        '415':
+          $ref: '#/components/responses/415-problem'
+        '422':
+          $ref: '#/components/responses/422-problem'
+        '429':
+          $ref: '#/components/responses/429-empty'
+        '500':
+          $ref: '#/components/responses/500-empty'
+        default:
+          $ref: '#/components/responses/500-empty'
+      security:
+      - oauth2-primary-flow:
+        - write:temporary-aar-exceptions
+components:
+  parameters:
+    period-start-query:
+      name: period-start
+      description: "Defines the start of an applicable operating period.  \n"
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/period-start'
+    period-end:
+      name: period-end
+      description: Specifies the end of a period for which a filter specifies.  Periods will only be returned that start prior to this time.
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/period-start'
+    id:
+      name: id
+      description: 'Opaque identifier for the object. Format of this identifier may
+
+        very depending on the implementation.
+
+        '
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/local'
+      examples:
+        uuid:
+          value: urn:uuid:123e4567-e89b-12d3-a456-426614174000
+          description: Example of a UUIDv4 identifier for an object.
+        eic:
+          value: urn:eic:10X1001A1001A515
+          description: Example of an ENTSO-E Energy Identification Code for an object.
+        qualified-entity-code:
+          value: org:naesb:weq:eir:MISO
+          description: 'A fully-qualified representation of an entity code from the NAESB WEQ-022
+
+            Electric Industry Registry, currently implemented by the OATI webRegistry.
+
+            Note that this representation is not an industry standard identifier
+
+            format but is presented as an example of a structured identifier for such
+
+            entity codes. In this example, the identifier is for Midcontinent
+
+            Independent System Operator (MISO).
+
+            '
+        entity-code:
+          value: MISO
+          description: 'A unqualified entity code from the NAESB WEQ-022 Electric Industry
+
+            Registry, currently implemented by the OATI webRegistry.  In this
+
+            example, the identifier is for Midcontinent Independent System Operator
+
+            (MISO).
+
+            '
+        ncr-id:
+          value: NCR00826
+          description: An example of a NERC Compliance Registry code for MISO.
+    query-filter:
+      name: monitoring-set
+      description: '
+
+        Only return ratings or limits for facilities of the associated
+
+        `monitoring-set`. The identifier for a `monitoring-set` is pre-coordinated,
+
+        but using the NERC id of the associated Ratings Provider for the default
+
+        monitoring set is recommended.
+
+        '
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/local'
+      examples:
+        name:
+          summary: A pre-coordinated name that nominates a `monitoring-set` for a specific entity or purpose.
+          value: X-AMPL
+        mrid:
+          summary: A pre-coordinated id that nominates a `monitoring-set`.
+          value: urn:uuid:12345678-1234-5678-1234-123456789012
+    segment-filter:
+      name: segment
+      description: "Only return limits for this segment.  \n"
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/local'
+      examples:
+        mrid:
+          summary: A CIM mrid
+          value: urn:uuid:12345678-1234-5678-1234-123456789012
+        circuit-id:
+          summary: A typical AC line identifier
+          value: '86753_1'
+  responses:
+    403-empty:
+      description: Access denied
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    400-problem:
+      description: Malformed request
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    '304':
+      description: Not Modified.
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+    429-empty:
+      description: Too many requests (rate limiting)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    415-problem:
+      description: Unsupported media type
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        Accept:
+          schema:
+            type: string
+            pattern: ^((application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))(\,\s*(application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))*$
+            maxLength: 500
+          examples:
+            Forecast Proposal:
+              summary: Used to update the area-wide forecast
+              value: application/vnd.trolie.rating-forecast-proposal.v1+json
+            Real-Time Proposal:
+              summary: Used to update the area-wide nowcast
+              value: application/vnd.trolie.rating-realtime-proposal.v1+json
+        Accept-Encoding:
+          description: 'The server must support and prefer Brotli yet must accept gzip for
+
+            compatibility.
+
+            '
+          schema:
+            type: string
+            enum:
+            - br,gzip
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    500-empty:
+      description: An unexpected error occurred
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    404-empty:
+      description: Not Found
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    410-problem:
+      description: 'Gone. The requested resource is no longer available.  TROLIE
+
+        implementations MAY return this status code when a resource is known to
+
+        have been deleted or archived, if the authenticated client would
+
+        otherwise have had authorized access to the resource.
+
+        '
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    406-problem:
+      description: Not Acceptable (Content negotiation failed)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    '204':
+      description: Operation successful. No Content.
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        ETag:
+          $ref: '#/components/headers/ETag'
+    401-empty:
+      description: Unauthorized
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    413-empty:
+      description: Payload too large
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    422-problem:
+      description: Unprocessable content
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+  schemas:
+    undervoltage-threshold:
+      type: object
+      title: Undervoltage Threshold
+      description: A lower limit to voltage for a transmission facility in kilovolts.
+      additionalProperties: false
+      properties:
+        kV-min:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - kV-min
+    active-power-with-power-factor:
+      type: object
+      title: Active Power and Power Factor
+      additionalProperties: false
+      properties:
+        mw:
+          type: number
+          description: Active Power in megawatts
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+        pf:
+          type: number
+          description: Assumed power factor.
+          format: float
+          minimum: 0
+          maximum: 1
+      required:
+      - mw
+      - pf
+    problem:
+      description: See [RFC9457](https://www.rfc-editor.org/rfc/rfc9457#appendix-A).
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          maxLength: 2048
+          description: 'A URI reference that identifies the problem type.
+
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-type)
+
+            '
+          example: https://iana.org/assignments/http-problem-types#date
+        title:
+          type: string
+          format: free-text
+          maxLength: 500
+          description: 'A short, human-readable summary of the problem type.
+
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-title)
+
+            '
+        status:
+          type: number
+          minimum: 100
+          maximum: 599
+          description: 'The HTTP status code generated by the origin server for this occurrence of the problem.
+
+            '
+        detail:
+          type: string
+          format: free-text
+          maxLength: 500
+          description: A human-readable explanation specific to this occurrence of the problem. See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-detail)
+        instance:
+          type: string
+          format: uri-reference
+          maxLength: 2048
+          description: 'A URI reference that identifies the specific occurrence of the problem.
+
+            It may or may not yield further information if dereferenced.
+
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-status)
+
+            '
+          example: https://iana.org/assignments/http-problem-types#date
+      required:
+      - type
+    data-provenance:
+      type: object
+      description: "\nProvides information about where the associated representation came from. *No\nfunctional aspects of the exchange are contingent upon this data.* However,\nthis information is meant to support debugging and application support use\ncases, so implementors are encouraged to provide\nmeaningful values.\n\n* `provider` identifies that entity, e.g., a Ratings Provider or Clearinghouse\n  Provider, that created the object. The `provider`'s NERC id is recommended.\n* `last-updated` indicates the wall-clock time at the `provider` when the\n  object was last modified. N.b. this is not when the message\n  describing the object was sent or received, i.e., implementors should not\n  simply insert the current timestamp here when preparing the object serialization.\n* `origin-id` is the identifier used by the `provider` to uniquely nominate\n  the object. It is recommended but not required that this be a URI.\n"
+      properties:
+        provider:
+          $ref: '#/components/schemas/entity'
+        last-updated:
+          $ref: '#/components/schemas/timestamp'
+        origin-id:
+          $ref: '#/components/schemas/local'
+      required:
+      - provider
+      - last-updated
+    active-power:
+      type: object
+      title: Active Power
+      additionalProperties: false
+      properties:
+        mw:
+          type: number
+          description: Active Power in megawatts
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - mw
+    empty:
+      description: Intended to proactively avoid information disclosure
+      type:
+      - string
+      - 'null'
+      maxLength: 0
+      pattern: ^$
+      example: ''
+    limit-value-set:
+      type: array
+      description: '
+
+        A set of general limit or rating values, each mapped to the various limit bands defined by the Transmission Provider''s operating manual. This typically consists of a "normal" limit, as well as limits for various levels of emergency conditions (typically 2-4) defined in the operations manual.
+
+        '
+      minItems: 1
+      maxItems: 10
+      items:
+        type: object
+        description: Operating Limit
+        properties:
+          duration-name:
+            description: 'A type of limit as defined in the Transmission Provider''s operating manual,
+
+              usually indicating specific scenarios under which the limit may be used as
+
+              well as a maximum period for which the limit may be safely applied.
+
+              '
+            type: string
+            maxLength: 20
+            pattern: ^[A-Za-z\-]{3,10}$
+            example: emergency
+          limit:
+            $ref: '#/components/schemas/limit'
+          limiting-analysis:
+            $ref: '#/components/schemas/limiting-analysis'
+        required:
+        - duration-name
+        - limit
+    limiting-analysis:
+      type: string
+      description: '
+
+        Indicates how a operating limit was determined. This is used to
+
+        provide context for the ratings proposals and limits snapshots. When defined
+
+        in the header, this is assumed to apply to any limit that does not specify its
+
+        own limiting analysis. When defined for a period, it applies to the
+
+        `continuous-operating-limit` as well as the associated
+
+        `emergency-operating-limits`, unless the `emergency-operating-limits` specify
+
+        their own limiting analysis.
+
+
+        THERMAL_RATING - The limit was determined by the thermal rating of underlying
+
+        equipment.
+
+
+        TRANSIENT_SECURITY_ASSESSMENT - Studies of the system''s transient stability
+
+        determined the limit.
+
+
+        VOLTAGE_SECURITY_ASSESSMENT - Studies of the system''s voltage stability
+
+        determined the limit.
+
+
+        SMALL_SIGNAL_STABILITY_ASSESSMENT - Small-signal stability studies determined
+
+        the limit.
+
+
+        SYSTEM_SPECIFIC - This could account for limits imposed by specific system
+
+        characteristics, such as the presence of sensitive loads, the need to maintain
+
+        specific power flows, or other reliability/volatility reasons. These include
+
+        limits defined by Special Protection Schemes and Remedial Action Schemes.
+
+
+        ENVIRONMENTAL_CONDITIONS - The limit was determined by exceptional
+
+        environmental conditions such as wildfire risk, ice loading, excessive
+
+        wind/galloping, or other factors.
+
+
+        CONTRACT_CAPACITY - The available facility transfer capacity is limited
+
+        by contractual obligations.
+
+
+        REGULATORY_REQUIREMENTS - The limit is imposed by regulatory requirements.
+
+
+        OTHER - The limit was determined by some other means not anticipated in this
+
+        standard.
+
+        '
+      enum:
+      - THERMAL_RATING
+      - TRANSIENT_SECURITY_ASSESSMENT
+      - VOLTAGE_SECURITY_ASSESSMENT
+      - SMALL_SIGNAL_STABILITY_ASSESSMENT
+      - SYSTEM_SPECIFIC
+      - ENVIRONMENTAL_CONDITIONS
+      - REGULATORY_REQUIREMENTS
+      - CONTRACT_CAPACITY
+      - OTHER
+    name-type:
+      description: Type of the name being referenced.  Corresponds to the IEC CIM `NameType` concept.
+      type: string
+      maxLength: 20
+      pattern: ^[A-Za-z0-9\-]{3,20}$
+      example: EMSID
+    local:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a identifier that is unique for an object in the context of an
+
+        exchange between two grid operators.
+
+        '
+      example: '86753_1'
+    temporary-aar-exception-request:
+      type: object
+      description: 'Represents a temporary AAR Exception against a resource.
+
+        Includes a start and (optional) end time, and a reason.
+
+
+        May or may not include a set of values, depending on the business
+
+        context in which the temporary AAR exception is used.
+
+        '
+      properties:
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        resource:
+          $ref: '#/components/schemas/names'
+        start-time:
+          $ref: '#/components/schemas/period-start'
+        end-time:
+          $ref: '#/components/schemas/period-start'
+        continuous-operating-limit:
+          $ref: '#/components/schemas/limit'
+        emergency-operating-limits:
+          $ref: '#/components/schemas/limit-value-set'
+        reason:
+          description: 'Free-form text indicating the reason for the exception.
+
+            '
+          type: string
+          format: free-form
+          maxLength: 4000
+      additionalProperties: false
+      required:
+      - resource
+      - start-time
+      - continuous-operating-limit
+      - emergency-operating-limits
+    temporary-aar-exception-set:
+      type: array
+      minItems: 0
+      maxItems: 50000
+      items:
+        $ref: '#/components/schemas/temporary-aar-exception'
+    overvoltage-threshold-pu:
+      type: object
+      title: Overvoltage Threshold per unit
+      description: 'An upper limit to voltage for a transmission facility in per unit with the base voltage assumed to be the nominal voltage.
+
+        '
+      additionalProperties: false
+      properties:
+        voltage-pu-max:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 2
+      required:
+      - voltage-pu-max
+    undervoltage-threshold-pu:
+      type: object
+      title: Undervoltage Threshold per unit
+      description: 'An lower limit to voltage for a transmission facility in per unit with the nominal voltage assumed to be the base voltage.
+
+        '
+      additionalProperties: false
+      properties:
+        voltage-pu-min:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 2
+      required:
+      - voltage-pu-min
+    resource-id:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for a power system resource, such as a
+
+        transmission facility, segment, interface, etc. This identifier is typically
+
+        used between reliability coordinators in operations.
+
+        '
+      example: urn:uuid:123e4567-e89b-12d3-a456-426614174000
+    temporary-aar-exception:
+      type: object
+      description: 'Data structure for a temporary AAR Exception against a resource.
+
+        Includes a unique ID, start and (optional) end time, and a reason.
+
+
+        May or may not include a set of values, depending on the business
+
+        context in which the temporary AAR exception is used.
+
+        '
+      properties:
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        resource:
+          $ref: '#/components/schemas/names'
+        start-time:
+          $ref: '#/components/schemas/period-start'
+        end-time:
+          $ref: '#/components/schemas/period-start'
+        continuous-operating-limit:
+          $ref: '#/components/schemas/limit'
+        emergency-operating-limits:
+          $ref: '#/components/schemas/limit-value-set'
+        reason:
+          description: 'Free-form text indicating the reason for the exception.
+
+            '
+          type: string
+          format: free-form
+          maxLength: 4000
+        id:
+          $ref: '#/components/schemas/local'
+      additionalProperties: false
+      required:
+      - id
+      - resource
+      - start-time
+      - continuous-operating-limit
+      - emergency-operating-limits
+    limit:
+      type: object
+      title: Limit
+      description: "\nDefines the limit. In practice most exchanges will only support one kind of\nlimit for proposals and snapshots. However, the specification supports\ndefining limits on a per resource basis as well as limit types that are not\nanticipated to be used to implement Order 881. TROLIE server implementations\nmust support at least one of these limit types and should return a well known\n`application/problem+json` response if they receive a proposal in an\nunsupported but valid limit type as defined here.\n\nWhen used as the media type parameter `limit-type`, these are nominated by\nthe following names.\n\n  * `active-power`\n  * `active-power-with-power-factor`\n  * `apparent-power`\n  * `current`\n  * `reactive-power`\n  * `overvoltage-threshold-pu`\n  * `overvoltage-threshold`\n  * `undervoltage-threshold-pu`\n  * `undervoltage-threshold`\n"
+      oneOf:
+      - $ref: '#/components/schemas/active-power'
+      - $ref: '#/components/schemas/active-power-with-power-factor'
+      - $ref: '#/components/schemas/apparent-power'
+      - $ref: '#/components/schemas/current'
+      - $ref: '#/components/schemas/reactive-power'
+      - $ref: '#/components/schemas/overvoltage-threshold-pu'
+      - $ref: '#/components/schemas/overvoltage-threshold'
+      - $ref: '#/components/schemas/undervoltage-threshold-pu'
+      - $ref: '#/components/schemas/undervoltage-threshold'
+    current:
+      type: object
+      title: Current
+      description: Representation of a thermal limit in amperes.
+      additionalProperties: false
+      properties:
+        amps:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 100000
+      required:
+      - amps
+    period-start:
+      description: '
+
+        RFC 3339 date-time string with *no fractional seconds component* that
+
+        designates a start or end to an operating period (such as an hour) that starts
+
+        at a specified time. This will frequently be at the start of an hour, but may
+
+        be finer-grained, such as every 30 minutes, should the Clearinghouse Provider
+
+        choose.
+
+
+        If the Transmission Provider is operating in EST, these are valid and
+
+        equivalent values:
+
+
+        * 2023-01-01T06:00Z
+
+        * 2023-01-01T01:00-5:00
+
+        * 2023-01-01T00:00-6:00
+
+        * 2023-01-01T11:30+5:30
+
+
+        The server should uniformly represent date-times in the operational time zone
+
+        of the Clearinghouse Provider.
+
+        '
+      type: string
+      format: date-time
+      maxLength: 25
+      example: '2025-07-12T03:00:00-05:00'
+    apparent-power:
+      type: object
+      title: Apparent Power
+      additionalProperties: false
+      properties:
+        mva:
+          type: number
+          description: Representation of a limit in megavolt-amperes (MVA).
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - mva
+    timestamp:
+      description: RFC 3339 date-time string with a maximum of 10 digits in the fractional seconds component, i.e., nanosecond precision.
+      type: string
+      format: date-time
+      maxLength: 35
+    reactive-power:
+      type: object
+      title: Reactive Power
+      description: Representation of a limit in megavolt-amperes reactive (MVAR).
+      additionalProperties: false
+      properties:
+        mvar:
+          type: number
+          format: float
+          minimum: -10000
+          maximum: 10000
+      required:
+      - mvar
+    overvoltage-threshold:
+      type: object
+      title: Overvoltage Threshold
+      description: An upper limit to voltage for a transmission facility in kilovolts.
+      additionalProperties: false
+      properties:
+        kV-max:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - kV-max
+    names:
+      type: object
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        alternate-identifiers:
+          type: array
+          maxItems: 10
+          minItems: 1
+          items:
+            type: object
+            properties:
+              name:
+                $ref: '#/components/schemas/local'
+              type:
+                $ref: '#/components/schemas/name-type'
+              authority:
+                $ref: '#/components/schemas/entity'
+              mrid:
+                $ref: '#/components/schemas/local'
+            required:
+            - name
+      required:
+      - resource-id
+    entity:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for an entity, such as a grid operator or
+
+        organization. This identifier is typically used in the context of data
+
+        exchange between entities.
+
+        '
+      example: org:naesb:weq:eir:MISO
+  headers:
+    Location:
+      description: 'The "Location" header field is used in some responses to refer to a specific  resource in relation to the response. In TROLIE, this is always associated with a 201 response (a POST), and therefore refers to the URI of the resource created.
+
+        '
+      schema:
+        type: string
+        format: uri-reference
+        maxLength: 1000
+    ETag:
+      description: 'An opaque, unique identifier--typically a hash value--for a specific version of a resource. The modeled resource state is what is versioned, not the content of any particular representation. The server MUST use a strong validator so that the same ETag is returned regardless of the media type of the representation.
+
+        '
+      schema:
+        type: string
+        format: hash
+        maxLength: 256
+        additionalProperties: false
+    X-Rate-Limit-Limit:
+      description: The number of allowed requests in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
+    Retry-After:
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 60
+        example: 60
+        description: The seconds to delay after the response is received.
+    X-Rate-Limit-Reset:
+      description: The number of seconds left in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
+    X-Rate-Limit-Remaining:
+      description: The number of remaining requests in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
+  securitySchemes:
+    oauth2-primary-flow:
+      type: oauth2
+      description: Support RFC8725 JWT tokens.
+      flows:
+        clientCredentials:
+          tokenUrl: https://no-server/oauth2
+          scopes:
+            read:monitoring-sets: Read monitoring sets
+            read:forecast-proposals: Read Forecast rating proposals
+            read:realtime-proposals: Read real-time rating proposals
+            read:seasonal-proposals: Read seasonal rating proposals
+            read:temporary-aar-exceptions: Read temporary AAR exceptions
+            read:seasonal-overrides: Read seasonal overrides
+            write:monitoring-sets: Write monitoring sets
+            write:forecast-proposals: Submit forecasted ratings
+            write:realtime-proposals: Submit realtime ratings
+            write:seasonal-proposals: Submit seasonal ratings
+            write:temporary-aar-exceptions: Write temporary AAR exceptions
+            write:seasonal-overrides: Write seasonal overrides
+            read:operating-snapshot: Read the ratings and limits snapshots in-use by the transmission provider
+            read:regional-operating-snapshot: Read a Regional Operating Snapshot
+            write:regional-operating-snapshot: Write a Regional Operating Snapshot
+x-tagGroups:
+- name: Operations
+  tags:
+  - Real-Time
+  - Forecasting
+  - Seasonal
+  - Seasonal Overrides
+  - Temporary AAR Exceptions
+  - Monitoring Sets
+- name: Common Schemas
+  tags:
+  - limit-type
