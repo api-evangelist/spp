@@ -1,0 +1,57 @@
+# Kin Score artifact — spp — 2026-08-28T221322
+# The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
+---
+kin_score:
+  slug: spp
+  schema_version: 0.15.1
+  scored_at: '2026-08-28'
+  run_ts: 2026-08-28T221322
+  composite: 53.6
+  band: developing
+  facets:
+    discoverability: 75.9
+    contract_quality: 63.2
+    governance: 16.7
+    operational_transparency: 5.3
+    developer_ergonomics: 62.5
+    commercial_clarity: 42.1
+    contract_governance: 16.7
+    access_clarity: 42.1
+  agent_readiness:
+    score: 43.3
+    band: agent-ready
+    band_gated_from: agent-native
+    dimensions:
+      spec_presence: true
+      agentic_access: false
+      reversibility_documented: false
+      mcp_server: false
+      auth_clarity: served
+      idempotency: false
+      error_semantics: verified
+      openapi_examples: verified
+      rate_limit_signal: verified
+      event_surface_described: false
+      agent_skills: derived
+      well_known_catalog: true
+      consent_identity: false
+      agent_card: false
+      dry_run_mode: false
+      delegated_identity: false
+      protected_resource_metadata: false
+      dynamic_client_registration: true
+      agentic_commerce: false
+  regulatory:
+    applies: true
+    regime: Energy & Utilities
+    regime_id: energy_utilities
+    score: 63.5
+    matched_via: tags
+  provenance:
+    skills: derived
+    conformance: derived
+    contracts:
+      total: 1
+      derived: 0
+      coverage: 0.0
+      callable: 0.0
