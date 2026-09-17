@@ -226,39 +226,6 @@ apis:
     url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
   - type: Specification
     url: https://trolie.energy/spec
-- aid: spp:spp-real-time-api
-  name: Southwest Power Pool Real Time API
-  description: >-
-    If permitted by the Clearinghouse Provider, its Ratings Providers can use
-
-    these functions to exchange real-time ratings, supplementing or replacing
-
-    traditional telemetry protocols like ICCP.
-
-
-    These ratings are based on real-time measurements of ambient conditions
-
-    and will be used by Transmission Providers for real-time grid operations
-
-    processes, including state estimation and real-time markets.  The clearing
-
-    of real-time ratings may be more frequent than for forecast ratings, but
-
-    the frequency is the prerogative of the Clearinghouse Provider.
-
-
-    These ratings may be either AARs or DLRs.
-  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
-  baseURL: ftp://pubftp.spp.org
-  tags:
-  - Real-Time
-  properties:
-  - type: OpenAPI
-    url: openapi/spp-real-time-api-openapi.yml
-  - type: Documentation
-    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
-  - type: Specification
-    url: https://trolie.energy/spec
 - aid: spp:spp-seasonal-api
   name: Southwest Power Pool Seasonal API
   description: >-
@@ -367,6 +334,25 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/spp-temporary-aar-exceptions-api-openapi.yml
+  - type: Documentation
+    url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
+  - type: Specification
+    url: https://trolie.energy/spec
+- aid: spp:spp-realtime-api
+  name: Southwest Power Pool Realtime API
+  description: >-
+    If permitted by the Clearinghouse Provider, its Ratings Providers can use
+
+    these functions to exchange real-time ratings, supplementing or replacing
+
+    traditional telemetry protocols like ICCP.
+  humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
+  baseURL: ftp://pubftp.spp.org
+  tags:
+  - Realtime
+  properties:
+  - type: OpenAPI
+    url: openapi/spp-realtime-api-openapi.yml
   - type: Documentation
     url: https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf
   - type: Specification
