@@ -1,0 +1,33 @@
+{
+  "provider": "spp",
+  "sources": [
+    "_original/trolie-standard-openapi.yml"
+  ],
+  "outputs": [
+    "spp-forecasting-api-openapi.yml",
+    "spp-monitoring-sets-api-openapi.yml",
+    "spp-real-time-api-openapi.yml",
+    "spp-seasonal-api-openapi.yml",
+    "spp-seasonal-overrides-api-openapi.yml",
+    "spp-temporary-aar-exceptions-api-openapi.yml"
+  ],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "trolie-standard-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "superseded outputs removed: spp-realtime-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 11 total)"
+  ],
+  "skipped": [
+    "spp-forecasting-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spp-monitoring-sets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spp-realtime-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spp-seasonal-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spp-seasonal-overrides-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spp-temporary-aar-exceptions-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

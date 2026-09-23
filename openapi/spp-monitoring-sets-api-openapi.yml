@@ -1,10 +1,14 @@
 openapi: 3.2.0
 info:
-  title: Transmission Ratings and Operating Limits Information Exchange (TROLIE) Monitoring Sets API
+  title: Transmission Ratings and Operating Limits Information…
   x-logo:
     altText: TROLIE logo
     url: images/TROLIE-horizontal-color.svg
-  description: "\nThis specification defines a set of operations for the exchange of power\nsystem ratings and limits between entities that own and operate the electric\npower system in North America. In particular, it is designed to support the\nexchange of Ambient Adjusted Ratings (AARs), pursuant to FERC Order 881.  It\nis published as a community standard to facilitate interoperability\nin these exchanges.\n\nThe specification conceives of the exchange as being between two primary\nentities:\n\n* A [Ratings Provider](https://trolie.energy/concepts#ratings-provider) is\n an entity that is responsible for providing ratings on some set of power\n system resources, e.g., Transmission Facilities, typically a Transmission\n Owner or Transmission Operator.  The ratings are provided to a\n Clearinghouse Provider whose is responsible for determining the operating\n limits of the power system resources.\n\n* The [Clearinghouse Provider](https://trolie.energy/concepts#clearinghouse-provider) is\n  typically a Transmission Provider (FERC) and a Reliability Coordinator (NERC).\n\nAdjacent Clearinghouse Providers exchange ratings in order to establish\noperating limit values for the power system resources that are shared\nbetween them.\n\nA Ratings Provider is assumed by this specification to have pre-coordinated \nwith a Clearinghouse Provider to identify the former's Ratings Obligation,\ni.e., the set of power system resources for which they will provide ratings.\nAdditionally, the Ratings Provider will have similarly pre-coordinated the\ndefinition of their Monitoring Sets, i.e., their power system limits of\ninterest. The nature and method of pre-coordination is out-of-scope for this\nspecification.\n\nNote that this API makes a strict distinction between the terms rating and\nlimit.  Colloquially, these terms are often used interchangeably.  However,\nin the context of this specification, they have distinct meanings. At a\nhigh-level, the specification defines an exchange where ratings go in and\nlimits come out. A Clearinghouse is a function for determining the operating\nlimits from the ratings it has on-hand, including those that are proposed by\nRatings Providers and any applicable time-bound static ratings.\n\nThis interaction diagram highlights the primary requests and responses that\nare defined in this spec. Note that not all of the operations will be\nsupported by every implementation.\n\n<img src=\"images/interactions.excalidraw.png\" alt=\"Primary Interactions with Ratings Provider\" />\n"
+  description: 'This specification defines a set of operations for the exchange of power
+
+    system ratings and limits between entities that own and operate the electric
+
+    power system in North America.'
   version: 1.1.0
   contact:
     name: TROLIE Maintainers
@@ -19,9 +23,7 @@ security:
 - oauth2-primary-flow: []
 tags:
 - name: Monitoring Sets
-  description: '
-
-    [Monitoring Sets](https://trolie.energy/concepts#monitoring-sets) are
+  description: 'Monitoring Sets are
 
     named sets of power system resources that may be used to filter ratings
 
@@ -31,16 +33,12 @@ tags:
 
     that the sender and receiver have predefined the appropriate Monitoring
 
-    Sets.
-
-    '
+    Sets.'
 paths:
   /monitoring-sets:
     post:
       operationId: createMonitoringSet
-      description: '
-
-        Create a new monitoring set. The server will assign a unique identifier and
+      description: 'Create a new monitoring set. The server will assign a unique identifier and
 
         source info to the monitoring set upon creation. This information will be
 
@@ -57,9 +55,7 @@ paths:
 
         As another example, a provided `alternate-identifiers` entry may conflict
 
-        with existing identifiers.
-
-        '
+        with existing identifiers.'
       summary: Create a new monitoring set
       tags:
       - Monitoring Sets
@@ -179,7 +175,7 @@ paths:
     get:
       operationId: getMonitoringSet
       description: Obtain a specific monitoring set by identifier.
-      summary: Obtain a specific monitoring set by identifier.
+      summary: Obtain a specific monitoring set by identifier
       tags:
       - Monitoring Sets
       parameters:
@@ -275,9 +271,7 @@ paths:
         - read:monitoring-sets
     put:
       operationId: updateMonitoringSet
-      description: '
-
-        Update an existing monitoring set.
+      description: 'Update an existing monitoring set.
 
         Returns 403 Forbidden if the monitoring set is read-only.
 
@@ -299,9 +293,7 @@ paths:
 
         defined in the monitoring set cannot be found; you cannot monitor a facility
 
-        that does not exist.
-
-        '
+        that does not exist.'
       summary: Update an existing monitoring set
       tags:
       - Monitoring Sets
@@ -369,19 +361,15 @@ paths:
         - write:monitoring-sets
     delete:
       operationId: deleteMonitoringSet
-      description: '
-
-        Delete a specific monitoring set by its identifier. Returns 403 Forbidden if
+      description: 'Delete a specific monitoring set by its identifier. Returns 403 Forbidden if
 
         the monitoring set is read-only. Returns 404 Not Found if the monitoring set
 
-        does not exist or the principal does not have read access to it.  Returns
+        does not exist or the principal does not have read access to it. Returns
 
         409 Conflict if the monitoring set cannot be deleted, for example, if it is
 
-        currently the authenticated principal''s default monitoring set.
-
-        '
+        currently the authenticated principal''s default monitoring set.'
       summary: Delete a specific monitoring set by its identifier
       tags:
       - Monitoring Sets
@@ -412,18 +400,14 @@ paths:
   /default-monitoring-set:
     get:
       operationId: getDefaultMonitoringSet
-      summary: Obtain your default monitoring set.
-      description: '
-
-        Obtain the default monitoring set for the authorized principal.  TROLIE
+      summary: Obtain your default monitoring set
+      description: 'Obtain the default monitoring set for the authorized principal. TROLIE
 
         implementations SHOULD provide a default monitoring set for each principal.
 
         The default monitoring set is the monitoring set that is used for limits
 
-        snapshots when the `monitoring-set-id` query parameter is not supplied.
-
-        '
+        snapshots when the `monitoring-set-id` query parameter is not supplied.'
       tags:
       - Monitoring Sets
       responses:
@@ -517,8 +501,121 @@ paths:
         - read:monitoring-sets
 components:
   responses:
+    422-problem:
+      description: Unprocessable content
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    401-empty:
+      description: Unauthorized
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    429-empty:
+      description: Too many requests (rate limiting)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    '204':
+      description: Operation successful. No Content.
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        ETag:
+          $ref: '#/components/headers/ETag'
+    406-problem:
+      description: Not Acceptable (Content negotiation failed)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
     403-empty:
       description: Access denied
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    '409':
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+    404-empty:
+      description: Not Found
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    '304':
+      description: Not Modified.
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+    500-empty:
+      description: An unexpected error occurred
       headers:
         X-Rate-Limit-Limit:
           $ref: '#/components/headers/X-Rate-Limit-Limit'
@@ -543,8 +640,8 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/problem'
-    '304':
-      description: Not Modified.
+    413-empty:
+      description: Payload too large
       headers:
         X-Rate-Limit-Limit:
           $ref: '#/components/headers/X-Rate-Limit-Limit'
@@ -552,30 +649,6 @@ components:
           $ref: '#/components/headers/X-Rate-Limit-Remaining'
         X-Rate-Limit-Reset:
           $ref: '#/components/headers/X-Rate-Limit-Reset'
-    '409':
-      description: Conflict
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-    429-empty:
-      description: Too many requests (rate limiting)
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-        Retry-After:
-          $ref: '#/components/headers/Retry-After'
       content:
         application/*:
           schema:
@@ -615,103 +688,123 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/problem'
-    500-empty:
-      description: An unexpected error occurred
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    404-empty:
-      description: Not Found
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    406-problem:
-      description: Not Acceptable (Content negotiation failed)
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-    '204':
-      description: Operation successful. No Content.
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-        ETag:
-          $ref: '#/components/headers/ETag'
-    401-empty:
-      description: Unauthorized
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    413-empty:
-      description: Payload too large
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    422-problem:
-      description: Unprocessable content
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
   schemas:
-    named-power-system-resources:
-      type: array
-      minItems: 1
-      maxItems: 50000
-      description: Collection of power system resource names
-      items:
-        $ref: '#/components/schemas/names'
+    empty:
+      description: Intended to proactively avoid information disclosure
+      type:
+      - string
+      - 'null'
+      maxLength: 0
+      pattern: ^$
+      example: ''
+    response_v2:
+      type: object
+      description: "See https://trolie.energy/concepts.html#monitoring-sets for info on the \nmonitoring set concept in TROLIE.  \n\nThis representation is intended to be enough for consumers to read it and tell where \nthe monitoring set came from, using metadata such as a source and an optional description.  \nIt also includes the list of resources included in the monitoring set, as well as all\ntheir known aliases.  \n"
+      properties:
+        name:
+          type: string
+          description: A human-readable name for this monitoring set
+          maxLength: 255
+          minLength: 1
+          pattern: ^[a-zA-Z0-9 _-]{1,255}$
+        description:
+          type: string
+          format: free-form
+          description: A description of this monitoring set
+          maxLength: 1000
+        power-system-resources:
+          $ref: '#/components/schemas/named-power-system-resources'
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        id:
+          $ref: '#/components/schemas/local'
+      required:
+      - source
+      - id
+      - name
+      - power-system-resources
+    entity:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for an entity, such as a grid operator or
+
+        organization. This identifier is typically used in the context of data
+
+        exchange between entities.
+
+        '
+      example: org:naesb:weq:eir:MISO
+    timestamp:
+      description: RFC 3339 date-time string with a maximum of 10 digits in the fractional seconds component, i.e., nanosecond precision.
+      type: string
+      format: date-time
+      maxLength: 35
+    local:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a identifier that is unique for an object in the context of an
+
+        exchange between two grid operators.
+
+        '
+      example: '86753_1'
+    data-provenance:
+      type: object
+      description: "\nProvides information about where the associated representation came from. *No\nfunctional aspects of the exchange are contingent upon this data.* However,\nthis information is meant to support debugging and application support use\ncases, so implementors are encouraged to provide\nmeaningful values.\n\n* `provider` identifies that entity, e.g., a Ratings Provider or Clearinghouse\n  Provider, that created the object. The `provider`'s NERC id is recommended.\n* `last-updated` indicates the wall-clock time at the `provider` when the\n  object was last modified. N.b. this is not when the message\n  describing the object was sent or received, i.e., implementors should not\n  simply insert the current timestamp here when preparing the object serialization.\n* `origin-id` is the identifier used by the `provider` to uniquely nominate\n  the object. It is recommended but not required that this be a URI.\n"
+      properties:
+        provider:
+          $ref: '#/components/schemas/entity'
+        last-updated:
+          $ref: '#/components/schemas/timestamp'
+        origin-id:
+          $ref: '#/components/schemas/local'
+      required:
+      - provider
+      - last-updated
+    name-type:
+      description: Type of the name being referenced.  Corresponds to the IEC CIM `NameType` concept.
+      type: string
+      maxLength: 20
+      pattern: ^[A-Za-z0-9\-]{3,20}$
+      example: EMSID
+    resource-id:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for a power system resource, such as a
+
+        transmission facility, segment, interface, etc. This identifier is typically
+
+        used between reliability coordinators in operations.
+
+        '
+      example: urn:uuid:123e4567-e89b-12d3-a456-426614174000
+    names:
+      type: object
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        alternate-identifiers:
+          type: array
+          maxItems: 10
+          minItems: 1
+          items:
+            type: object
+            properties:
+              name:
+                $ref: '#/components/schemas/local'
+              type:
+                $ref: '#/components/schemas/name-type'
+              authority:
+                $ref: '#/components/schemas/entity'
+              mrid:
+                $ref: '#/components/schemas/local'
+            required:
+            - name
+      required:
+      - resource-id
     problem:
       description: See [RFC9457](https://www.rfc-editor.org/rfc/rfc9457#appendix-A).
       type: object
@@ -786,19 +879,13 @@ components:
       - source
       - id
       - power-system-resources
-    data-provenance:
-      type: object
-      description: "\nProvides information about where the associated representation came from. *No\nfunctional aspects of the exchange are contingent upon this data.* However,\nthis information is meant to support debugging and application support use\ncases, so implementors are encouraged to provide\nmeaningful values.\n\n* `provider` identifies that entity, e.g., a Ratings Provider or Clearinghouse\n  Provider, that created the object. The `provider`'s NERC id is recommended.\n* `last-updated` indicates the wall-clock time at the `provider` when the\n  object was last modified. N.b. this is not when the message\n  describing the object was sent or received, i.e., implementors should not\n  simply insert the current timestamp here when preparing the object serialization.\n* `origin-id` is the identifier used by the `provider` to uniquely nominate\n  the object. It is recommended but not required that this be a URI.\n"
-      properties:
-        provider:
-          $ref: '#/components/schemas/entity'
-        last-updated:
-          $ref: '#/components/schemas/timestamp'
-        origin-id:
-          $ref: '#/components/schemas/local'
-      required:
-      - provider
-      - last-updated
+    named-power-system-resources:
+      type: array
+      minItems: 1
+      maxItems: 50000
+      description: Collection of power system resource names
+      items:
+        $ref: '#/components/schemas/names'
     request:
       type: object
       description: '
@@ -842,118 +929,7 @@ components:
       required:
       - power-system-resources
       - name
-    empty:
-      description: Intended to proactively avoid information disclosure
-      type:
-      - string
-      - 'null'
-      maxLength: 0
-      pattern: ^$
-      example: ''
-    name-type:
-      description: Type of the name being referenced.  Corresponds to the IEC CIM `NameType` concept.
-      type: string
-      maxLength: 20
-      pattern: ^[A-Za-z0-9\-]{3,20}$
-      example: EMSID
-    local:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a identifier that is unique for an object in the context of an
-
-        exchange between two grid operators.
-
-        '
-      example: '86753_1'
-    resource-id:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a unique identifier for a power system resource, such as a
-
-        transmission facility, segment, interface, etc. This identifier is typically
-
-        used between reliability coordinators in operations.
-
-        '
-      example: urn:uuid:123e4567-e89b-12d3-a456-426614174000
-    response_v2:
-      type: object
-      description: "See https://trolie.energy/concepts.html#monitoring-sets for info on the \nmonitoring set concept in TROLIE.  \n\nThis representation is intended to be enough for consumers to read it and tell where \nthe monitoring set came from, using metadata such as a source and an optional description.  \nIt also includes the list of resources included in the monitoring set, as well as all\ntheir known aliases.  \n"
-      properties:
-        name:
-          type: string
-          description: A human-readable name for this monitoring set
-          maxLength: 255
-          minLength: 1
-          pattern: ^[a-zA-Z0-9 _-]{1,255}$
-        description:
-          type: string
-          format: free-form
-          description: A description of this monitoring set
-          maxLength: 1000
-        power-system-resources:
-          $ref: '#/components/schemas/named-power-system-resources'
-        source:
-          $ref: '#/components/schemas/data-provenance'
-        id:
-          $ref: '#/components/schemas/local'
-      required:
-      - source
-      - id
-      - name
-      - power-system-resources
-    timestamp:
-      description: RFC 3339 date-time string with a maximum of 10 digits in the fractional seconds component, i.e., nanosecond precision.
-      type: string
-      format: date-time
-      maxLength: 35
-    names:
-      type: object
-      properties:
-        resource-id:
-          $ref: '#/components/schemas/resource-id'
-        alternate-identifiers:
-          type: array
-          maxItems: 10
-          minItems: 1
-          items:
-            type: object
-            properties:
-              name:
-                $ref: '#/components/schemas/local'
-              type:
-                $ref: '#/components/schemas/name-type'
-              authority:
-                $ref: '#/components/schemas/entity'
-              mrid:
-                $ref: '#/components/schemas/local'
-            required:
-            - name
-      required:
-      - resource-id
-    entity:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a unique identifier for an entity, such as a grid operator or
-
-        organization. This identifier is typically used in the context of data
-
-        exchange between entities.
-
-        '
-      example: org:naesb:weq:eir:MISO
   headers:
-    Location:
-      description: 'The "Location" header field is used in some responses to refer to a specific  resource in relation to the response. In TROLIE, this is always associated with a 201 response (a POST), and therefore refers to the URI of the resource created.
-
-        '
-      schema:
-        type: string
-        format: uri-reference
-        maxLength: 1000
     ETag:
       description: 'An opaque, unique identifier--typically a hash value--for a specific version of a resource. The modeled resource state is what is versioned, not the content of any particular representation. The server MUST use a strong validator so that the same ETag is returned regardless of the media type of the representation.
 
@@ -963,6 +939,20 @@ components:
         format: hash
         maxLength: 256
         additionalProperties: false
+    X-Rate-Limit-Remaining:
+      description: The number of remaining requests in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
+    X-Rate-Limit-Reset:
+      description: The number of seconds left in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
     X-Rate-Limit-Limit:
       description: The number of allowed requests in the current period
       schema:
@@ -970,6 +960,14 @@ components:
         format: int32
         minimum: 0
         maximum: 1000
+    Location:
+      description: 'The "Location" header field is used in some responses to refer to a specific  resource in relation to the response. In TROLIE, this is always associated with a 201 response (a POST), and therefore refers to the URI of the resource created.
+
+        '
+      schema:
+        type: string
+        format: uri-reference
+        maxLength: 1000
     Retry-After:
       schema:
         type: integer
@@ -978,20 +976,6 @@ components:
         maximum: 60
         example: 60
         description: The seconds to delay after the response is received.
-    X-Rate-Limit-Reset:
-      description: The number of seconds left in the current period
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 1000
-    X-Rate-Limit-Remaining:
-      description: The number of remaining requests in the current period
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 1000
   parameters:
     path-filter:
       name: id

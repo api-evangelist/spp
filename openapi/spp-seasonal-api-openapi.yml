@@ -1,10 +1,14 @@
 openapi: 3.2.0
 info:
-  title: Transmission Ratings and Operating Limits Information Exchange (TROLIE) Seasonal API
+  title: Transmission Ratings and Operating Limits Information…
   x-logo:
     altText: TROLIE logo
     url: images/TROLIE-horizontal-color.svg
-  description: "\nThis specification defines a set of operations for the exchange of power\nsystem ratings and limits between entities that own and operate the electric\npower system in North America. In particular, it is designed to support the\nexchange of Ambient Adjusted Ratings (AARs), pursuant to FERC Order 881.  It\nis published as a community standard to facilitate interoperability\nin these exchanges.\n\nThe specification conceives of the exchange as being between two primary\nentities:\n\n* A [Ratings Provider](https://trolie.energy/concepts#ratings-provider) is\n an entity that is responsible for providing ratings on some set of power\n system resources, e.g., Transmission Facilities, typically a Transmission\n Owner or Transmission Operator.  The ratings are provided to a\n Clearinghouse Provider whose is responsible for determining the operating\n limits of the power system resources.\n\n* The [Clearinghouse Provider](https://trolie.energy/concepts#clearinghouse-provider) is\n  typically a Transmission Provider (FERC) and a Reliability Coordinator (NERC).\n\nAdjacent Clearinghouse Providers exchange ratings in order to establish\noperating limit values for the power system resources that are shared\nbetween them.\n\nA Ratings Provider is assumed by this specification to have pre-coordinated \nwith a Clearinghouse Provider to identify the former's Ratings Obligation,\ni.e., the set of power system resources for which they will provide ratings.\nAdditionally, the Ratings Provider will have similarly pre-coordinated the\ndefinition of their Monitoring Sets, i.e., their power system limits of\ninterest. The nature and method of pre-coordination is out-of-scope for this\nspecification.\n\nNote that this API makes a strict distinction between the terms rating and\nlimit.  Colloquially, these terms are often used interchangeably.  However,\nin the context of this specification, they have distinct meanings. At a\nhigh-level, the specification defines an exchange where ratings go in and\nlimits come out. A Clearinghouse is a function for determining the operating\nlimits from the ratings it has on-hand, including those that are proposed by\nRatings Providers and any applicable time-bound static ratings.\n\nThis interaction diagram highlights the primary requests and responses that\nare defined in this spec. Note that not all of the operations will be\nsupported by every implementation.\n\n<img src=\"images/interactions.excalidraw.png\" alt=\"Primary Interactions with Ratings Provider\" />\n"
+  description: 'This specification defines a set of operations for the exchange of power
+
+    system ratings and limits between entities that own and operate the electric
+
+    power system in North America.'
   version: 1.1.0
   contact:
     name: TROLIE Maintainers
@@ -21,24 +25,7 @@ tags:
 - name: Seasonal
   description: 'Seasonal ratings are static ratings associated with extended durations,
 
-    typically months. These are typically used in both planning and
-
-    operations.
-
-
-    Power system resources that are exempt from providing AARs generally
-
-    operate at a seasonal rating. Even for resources using dynamic ratings, a
-
-    seasonal rating is still necessary. This acts as a recourse when a dynamic
-
-    rating is unavailable.  For example, a dynamic rating
-
-    might be unavailable during communication outages or for forecasts beyond
-
-    the ten-day period required by FERC Order 881.
-
-    '
+    typically months.'
 paths:
   /seasonal-ratings/snapshot:
     get:
@@ -248,9 +235,7 @@ paths:
     get:
       operationId: getSeasonalRatingProposalStatus
       summary: Obtain seasonal rating proposal status
-      description: '
-
-        Used to obtain the status of the Seasonal Ratings proposal. The response is
+      description: 'Used to obtain the status of the Seasonal Ratings proposal. The response is
 
         implicitly restricted to the requesting Ratings Provider''s obligation.
 
@@ -284,9 +269,7 @@ paths:
 
         limiting is done on a per Ratings Provider basis, so requests from
 
-        independent clients used by the same provider count against the same quota.
-
-        '
+        independent clients used by the same provider count against the same quota.'
       tags:
       - Seasonal
       responses:
@@ -356,15 +339,11 @@ paths:
     patch:
       operationId: patchSeasonalRatingsProposal
       summary: Submit a Seasonal Ratings proposal
-      description: '
-
-        This operation allows the Ratings Provider to provide a partial or complete
+      description: 'This operation allows the Ratings Provider to provide a partial or complete
 
         updates of their Seasonal Ratings that will be used by the Clearinghouse
 
-        Provider to determine the Seasonal Ratings Schedule.
-
-        '
+        Provider to determine the Seasonal Ratings Schedule.'
       tags:
       - Seasonal
       responses:
@@ -562,7 +541,315 @@ paths:
                 - - 156
                   - 161
 components:
+  responses:
+    422-problem:
+      description: Unprocessable content
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    401-empty:
+      description: Unauthorized
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    429-empty:
+      description: Too many requests (rate limiting)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    406-problem:
+      description: Not Acceptable (Content negotiation failed)
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    403-empty:
+      description: Access denied
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    404-empty:
+      description: Not Found
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    500-empty:
+      description: An unexpected error occurred
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    '304':
+      description: Not Modified.
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+    400-problem:
+      description: Malformed request
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    413-empty:
+      description: Payload too large
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+      content:
+        application/*:
+          schema:
+            $ref: '#/components/schemas/empty'
+    415-problem:
+      description: Unsupported media type
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        Accept:
+          schema:
+            type: string
+            pattern: ^((application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))(\,\s*(application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))*$
+            maxLength: 500
+          examples:
+            Forecast Proposal:
+              summary: Used to update the area-wide forecast
+              value: application/vnd.trolie.rating-forecast-proposal.v1+json
+            Real-Time Proposal:
+              summary: Used to update the area-wide nowcast
+              value: application/vnd.trolie.rating-realtime-proposal.v1+json
+        Accept-Encoding:
+          description: 'The server must support and prefer Brotli yet must accept gzip for
+
+            compatibility.
+
+            '
+          schema:
+            type: string
+            enum:
+            - br,gzip
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+    '406':
+      headers:
+        X-Rate-Limit-Limit:
+          $ref: '#/components/headers/X-Rate-Limit-Limit'
+        X-Rate-Limit-Remaining:
+          $ref: '#/components/headers/X-Rate-Limit-Remaining'
+        X-Rate-Limit-Reset:
+          $ref: '#/components/headers/X-Rate-Limit-Reset'
+        ETag:
+          $ref: '#/components/headers/ETag'
+      description: Not Acceptable (Content negotiation failed)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+          examples:
+            Compression Required:
+              summary: Only compressed responses are supported
+              value:
+                type: //trolie.example.com/spec/client-errors/406/compression-required
+                title: 'Not Acceptable: Accept-Encoding Required'
+                status: 406
+                detail: 'This resource must be compressed with one of the following algorithms: gzip, deflate, br.'
   schemas:
+    day-night:
+      description: '
+
+        Optional label to specify if the proposed seasonal ratings schedule is meant
+
+        to be used only during the day or only a night. If this field is not provided,
+
+        the schedule is assumed to be valid for both day and night.
+
+        '
+      type: string
+      enum:
+      - DAY
+      - NIGHT
+    overvoltage-threshold-pu:
+      type: object
+      title: Overvoltage Threshold per unit
+      description: 'An upper limit to voltage for a transmission facility in per unit with the base voltage assumed to be the nominal voltage.
+
+        '
+      additionalProperties: false
+      properties:
+        voltage-pu-max:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 2
+      required:
+      - voltage-pu-max
+    empty:
+      description: Intended to proactively avoid information disclosure
+      type:
+      - string
+      - 'null'
+      maxLength: 0
+      pattern: ^$
+      example: ''
+    seasonal-snapshot:
+      type: object
+      properties:
+        period-start:
+          $ref: '#/components/schemas/period-start'
+        period-end:
+          $ref: '#/components/schemas/period-start'
+        continuous-operating-limit:
+          $ref: '#/components/schemas/limit'
+        emergency-operating-limits:
+          $ref: '#/components/schemas/limit-value-set'
+        limiting-analysis:
+          $ref: '#/components/schemas/limiting-analysis'
+        season-name:
+          $ref: '#/components/schemas/season-name'
+        day-night:
+          $ref: '#/components/schemas/day-night'
+      required:
+      - period-start
+      - period-end
+      - continuous-operating-limit
+      - emergency-operating-limits
+      additionalProperties: false
+      description: Proposes the continuous and emergency ratings for the specified Season.
+      title: Seasonal Rating Proposal
+    entity:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for an entity, such as a grid operator or
+
+        organization. This identifier is typically used in the context of data
+
+        exchange between entities.
+
+        '
+      example: org:naesb:weq:eir:MISO
+    seasonal-ratings-proposal:
+      type: object
+      properties:
+        proposal-header:
+          $ref: '#/components/schemas/seasonal-proposal-header'
+        ratings:
+          type: array
+          minItems: 1
+          maxItems: 50000
+          description: Seasonal Ratings proposals
+          items:
+            $ref: '#/components/schemas/seasonal-proposals'
+      required:
+      - proposal-header
+      - ratings
+    seasonal-rating-snapshot-item-detailed:
+      type: object
+      additionalProperties: false
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        periods:
+          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
+          type: array
+          minItems: 1
+          maxItems: 240
+          items:
+            $ref: '#/components/schemas/seasonal-snapshot-detailed'
+    apparent-power:
+      type: object
+      title: Apparent Power
+      additionalProperties: false
+      properties:
+        mva:
+          type: number
+          description: Representation of a limit in megavolt-amperes (MVA).
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - mva
     missing-seasonal-obligation:
       type: object
       additionalProperties: false
@@ -580,114 +867,11 @@ components:
           maxItems: 240
           items:
             $ref: '#/components/schemas/season'
-    base-header:
-      type: object
-      properties:
-        source:
-          $ref: '#/components/schemas/data-provenance'
-        default-emergency-durations:
-          $ref: '#/components/schemas/emergency-durations'
-        default-limiting-analysis:
-          $ref: '#/components/schemas/limiting-analysis'
-      additionalProperties: false
-      required:
-      - source
-      - default-emergency-durations
-    seasonal-rating-snapshot-item-detailed:
-      type: object
-      additionalProperties: false
-      properties:
-        resource-id:
-          $ref: '#/components/schemas/resource-id'
-        periods:
-          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
-          type: array
-          minItems: 1
-          maxItems: 240
-          items:
-            $ref: '#/components/schemas/seasonal-snapshot-detailed'
-    undervoltage-threshold:
-      type: object
-      title: Undervoltage Threshold
-      description: A lower limit to voltage for a transmission facility in kilovolts.
-      additionalProperties: false
-      properties:
-        kV-min:
-          description: The voltage in kilovolts.
-          type: number
-          format: int32
-          minimum: 0
-          maximum: 1100
-      required:
-      - kV-min
-    input:
-      type: object
-      properties:
-        name:
-          type: string
-          format: free-text
-          maxLength: 50
-        value:
-          description: 'The value of the input used in the ratings determination.
-
-            The type of this value is not specified, but implementors
-
-            are encouraged to use CIM types where appropriate.
-
-            '
-        unit:
-          type: string
-          description: 'If the `value` is dimensionless, this property should not be
-
-            provided. Since we are not specifying which inputs shall be
-
-            provided, we cannot specify a definitive list of units, but
-
-            implementors are encouraged to use UnitSymbol from CIM when
-
-            appropriate: The CIM may not include appropriate units for
-
-            all inputs, e.g., wind speed, degrees Fahrenheit, etc.
-
-            '
-          format: unit
-          maxLength: 50
-      required:
-      - name
-      - value
-    named-power-system-resources:
-      type: array
-      minItems: 1
-      maxItems: 50000
-      description: Collection of power system resource names
-      items:
-        $ref: '#/components/schemas/names'
-    active-power-with-power-factor:
-      type: object
-      title: Active Power and Power Factor
-      additionalProperties: false
-      properties:
-        mw:
-          type: number
-          description: Active Power in megawatts
-          format: float
-          minimum: 1
-          maximum: 10000
-        kV:
-          description: The voltage in kilovolts.
-          type: number
-          format: int32
-          minimum: 0
-          maximum: 1100
-        pf:
-          type: number
-          description: Assumed power factor.
-          format: float
-          minimum: 0
-          maximum: 1
-      required:
-      - mw
-      - pf
+    timestamp:
+      description: RFC 3339 date-time string with a maximum of 10 digits in the fractional seconds component, i.e., nanosecond precision.
+      type: string
+      format: date-time
+      maxLength: 35
     seasonal-proposal-slim:
       type: array
       title: Seasonal Period Proposal slim
@@ -749,81 +933,36 @@ components:
           emergency_MW, emergency_pf]`, e.g., `[300, 1.0, 350, 1.0]`.
 
           '
-    seasonal-rating-snapshot-item:
+    limit:
       type: object
-      additionalProperties: false
+      title: Limit
+      description: "\nDefines the limit. In practice most exchanges will only support one kind of\nlimit for proposals and snapshots. However, the specification supports\ndefining limits on a per resource basis as well as limit types that are not\nanticipated to be used to implement Order 881. TROLIE server implementations\nmust support at least one of these limit types and should return a well known\n`application/problem+json` response if they receive a proposal in an\nunsupported but valid limit type as defined here.\n\nWhen used as the media type parameter `limit-type`, these are nominated by\nthe following names.\n\n  * `active-power`\n  * `active-power-with-power-factor`\n  * `apparent-power`\n  * `current`\n  * `reactive-power`\n  * `overvoltage-threshold-pu`\n  * `overvoltage-threshold`\n  * `undervoltage-threshold-pu`\n  * `undervoltage-threshold`\n"
+      oneOf:
+      - $ref: '#/components/schemas/active-power'
+      - $ref: '#/components/schemas/active-power-with-power-factor'
+      - $ref: '#/components/schemas/apparent-power'
+      - $ref: '#/components/schemas/current'
+      - $ref: '#/components/schemas/reactive-power'
+      - $ref: '#/components/schemas/overvoltage-threshold-pu'
+      - $ref: '#/components/schemas/overvoltage-threshold'
+      - $ref: '#/components/schemas/undervoltage-threshold-pu'
+      - $ref: '#/components/schemas/undervoltage-threshold'
+    seasonal-ratings-snapshot:
+      type: object
+      description: A snapshot of the seasonal ratings for a monitoring set.
       properties:
-        resource-id:
-          $ref: '#/components/schemas/resource-id'
-        periods:
-          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
+        snapshot-header:
+          $ref: '#/components/schemas/common-header'
+        ratings:
           type: array
           minItems: 1
-          maxItems: 240
+          maxItems: 50000
+          description: Set of forecast limits
           items:
-            $ref: '#/components/schemas/seasonal-snapshot'
-    problem:
-      description: See [RFC9457](https://www.rfc-editor.org/rfc/rfc9457#appendix-A).
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          maxLength: 2048
-          description: 'A URI reference that identifies the problem type.
-
-            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-type)
-
-            '
-          example: https://iana.org/assignments/http-problem-types#date
-        title:
-          type: string
-          format: free-text
-          maxLength: 500
-          description: 'A short, human-readable summary of the problem type.
-
-            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-title)
-
-            '
-        status:
-          type: number
-          minimum: 100
-          maximum: 599
-          description: 'The HTTP status code generated by the origin server for this occurrence of the problem.
-
-            '
-        detail:
-          type: string
-          format: free-text
-          maxLength: 500
-          description: A human-readable explanation specific to this occurrence of the problem. See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-detail)
-        instance:
-          type: string
-          format: uri-reference
-          maxLength: 2048
-          description: 'A URI reference that identifies the specific occurrence of the problem.
-
-            It may or may not yield further information if dereferenced.
-
-            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-status)
-
-            '
-          example: https://iana.org/assignments/http-problem-types#date
+            $ref: '#/components/schemas/seasonal-rating-snapshot-item'
       required:
-      - type
-    data-provenance:
-      type: object
-      description: "\nProvides information about where the associated representation came from. *No\nfunctional aspects of the exchange are contingent upon this data.* However,\nthis information is meant to support debugging and application support use\ncases, so implementors are encouraged to provide\nmeaningful values.\n\n* `provider` identifies that entity, e.g., a Ratings Provider or Clearinghouse\n  Provider, that created the object. The `provider`'s NERC id is recommended.\n* `last-updated` indicates the wall-clock time at the `provider` when the\n  object was last modified. N.b. this is not when the message\n  describing the object was sent or received, i.e., implementors should not\n  simply insert the current timestamp here when preparing the object serialization.\n* `origin-id` is the identifier used by the `provider` to uniquely nominate\n  the object. It is recommended but not required that this be a URI.\n"
-      properties:
-        provider:
-          $ref: '#/components/schemas/entity'
-        last-updated:
-          $ref: '#/components/schemas/timestamp'
-        origin-id:
-          $ref: '#/components/schemas/local'
-      required:
-      - provider
-      - last-updated
+      - snapshot-header
+      - ratings
     ratings:
       type: array
       minItems: 1
@@ -831,65 +970,19 @@ components:
       description: Set of forecast limits
       items:
         $ref: '#/components/schemas/seasonal-rating-snapshot-item-detailed'
-    active-power:
+    current:
       type: object
-      title: Active Power
+      title: Current
+      description: Representation of a thermal limit in amperes.
       additionalProperties: false
       properties:
-        mw:
+        amps:
           type: number
-          description: Active Power in megawatts
           format: float
           minimum: 1
-          maximum: 10000
-        kV:
-          description: The voltage in kilovolts.
-          type: number
-          format: int32
-          minimum: 0
-          maximum: 1100
+          maximum: 100000
       required:
-      - mw
-    empty:
-      description: Intended to proactively avoid information disclosure
-      type:
-      - string
-      - 'null'
-      maxLength: 0
-      pattern: ^$
-      example: ''
-    limit-value-set:
-      type: array
-      description: '
-
-        A set of general limit or rating values, each mapped to the various limit bands defined by the Transmission Provider''s operating manual. This typically consists of a "normal" limit, as well as limits for various levels of emergency conditions (typically 2-4) defined in the operations manual.
-
-        '
-      minItems: 1
-      maxItems: 10
-      items:
-        type: object
-        description: Operating Limit
-        properties:
-          duration-name:
-            description: 'A type of limit as defined in the Transmission Provider''s operating manual,
-
-              usually indicating specific scenarios under which the limit may be used as
-
-              well as a maximum period for which the limit may be safely applied.
-
-              '
-            type: string
-            maxLength: 20
-            pattern: ^[A-Za-z\-]{3,10}$
-            example: emergency
-          limit:
-            $ref: '#/components/schemas/limit'
-          limiting-analysis:
-            $ref: '#/components/schemas/limiting-analysis'
-        required:
-        - duration-name
-        - limit
+      - amps
     limiting-analysis:
       type: string
       description: '
@@ -968,12 +1061,128 @@ components:
       - REGULATORY_REQUIREMENTS
       - CONTRACT_CAPACITY
       - OTHER
-    name-type:
-      description: Type of the name being referenced.  Corresponds to the IEC CIM `NameType` concept.
+    seasonal-proposal-header-slim:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        default-emergency-durations:
+          $ref: '#/components/schemas/emergency-durations'
+        default-limiting-analysis:
+          $ref: '#/components/schemas/limiting-analysis'
+        power-system-resources:
+          $ref: '#/components/schemas/ordered-named-power-system-resources'
+        default-seasonal-schedule:
+          description: '
+
+            Defines the seasonal schedule that is used in the proposal.  Each season
+
+            is defined in the `schedule` array and the `ends` property defines the
+
+            end of the last season.  Each individual facility proposal must have
+
+            corresponding entry for each entry In the `schedule` array.
+
+            '
+          properties:
+            schedule:
+              $ref: '#/components/schemas/seasonal-schedule'
+            ends:
+              $ref: '#/components/schemas/period-start'
+            day-night:
+              $ref: '#/components/schemas/day-night'
+          required:
+          - schedule
+          - ends
+      additionalProperties: false
+      required:
+      - source
+      - default-emergency-durations
+      - power-system-resources
+      - default-seasonal-schedule
+      description: '
+
+        Describes the contents of the seasonal proposal. In particular, the
+
+        structure of the `ratings` is determined by the details provided in this
+
+        header.
+
+        '
+    local:
       type: string
-      maxLength: 20
-      pattern: ^[A-Za-z0-9\-]{3,20}$
-      example: EMSID
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a identifier that is unique for an object in the context of an
+
+        exchange between two grid operators.
+
+        '
+      example: '86753_1'
+    data-provenance:
+      type: object
+      description: "\nProvides information about where the associated representation came from. *No\nfunctional aspects of the exchange are contingent upon this data.* However,\nthis information is meant to support debugging and application support use\ncases, so implementors are encouraged to provide\nmeaningful values.\n\n* `provider` identifies that entity, e.g., a Ratings Provider or Clearinghouse\n  Provider, that created the object. The `provider`'s NERC id is recommended.\n* `last-updated` indicates the wall-clock time at the `provider` when the\n  object was last modified. N.b. this is not when the message\n  describing the object was sent or received, i.e., implementors should not\n  simply insert the current timestamp here when preparing the object serialization.\n* `origin-id` is the identifier used by the `provider` to uniquely nominate\n  the object. It is recommended but not required that this be a URI.\n"
+      properties:
+        provider:
+          $ref: '#/components/schemas/entity'
+        last-updated:
+          $ref: '#/components/schemas/timestamp'
+        origin-id:
+          $ref: '#/components/schemas/local'
+      required:
+      - provider
+      - last-updated
+    common-header:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        default-emergency-durations:
+          $ref: '#/components/schemas/emergency-durations'
+        default-limiting-analysis:
+          $ref: '#/components/schemas/limiting-analysis'
+        power-system-resources:
+          $ref: '#/components/schemas/named-power-system-resources'
+      additionalProperties: false
+      required:
+      - source
+      - default-emergency-durations
+      - power-system-resources
+    input:
+      type: object
+      properties:
+        name:
+          type: string
+          format: free-text
+          maxLength: 50
+        value:
+          description: 'The value of the input used in the ratings determination.
+
+            The type of this value is not specified, but implementors
+
+            are encouraged to use CIM types where appropriate.
+
+            '
+        unit:
+          type: string
+          description: 'If the `value` is dimensionless, this property should not be
+
+            provided. Since we are not specifying which inputs shall be
+
+            provided, we cannot specify a definitive list of units, but
+
+            implementors are encouraged to use UnitSymbol from CIM when
+
+            appropriate: The CIM may not include appropriate units for
+
+            all inputs, e.g., wind speed, degrees Fahrenheit, etc.
+
+            '
+          format: unit
+          maxLength: 50
+      required:
+      - name
+      - value
     emergency-durations:
       type: array
       description: Defines the durations in minutes used for emergency limits.
@@ -1002,70 +1211,6 @@ components:
         required:
         - name
         - duration-minutes
-    local:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a identifier that is unique for an object in the context of an
-
-        exchange between two grid operators.
-
-        '
-      example: '86753_1'
-    seasonal-ratings-snapshot-detailed-elide-psr:
-      type: object
-      description: A snapshot of the seasonal ratings for a monitoring set.
-      properties:
-        snapshot-header:
-          $ref: '#/components/schemas/base-header'
-        ratings:
-          $ref: '#/components/schemas/ratings'
-      required:
-      - snapshot-header
-      - ratings
-    overvoltage-threshold-pu:
-      type: object
-      title: Overvoltage Threshold per unit
-      description: 'An upper limit to voltage for a transmission facility in per unit with the base voltage assumed to be the nominal voltage.
-
-        '
-      additionalProperties: false
-      properties:
-        voltage-pu-max:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 2
-      required:
-      - voltage-pu-max
-    ordered-named-power-system-resources:
-      type: array
-      minItems: 1
-      maxItems: 50000
-      description: '
-
-        Ordered array of power system resource names. The order of these items
-
-        determines the order of the ratings proposals in the `ratings` array.
-
-        '
-      items:
-        $ref: '#/components/schemas/names'
-    undervoltage-threshold-pu:
-      type: object
-      title: Undervoltage Threshold per unit
-      description: 'An lower limit to voltage for a transmission facility in per unit with the nominal voltage assumed to be the base voltage.
-
-        '
-      additionalProperties: false
-      properties:
-        voltage-pu-min:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 2
-      required:
-      - voltage-pu-min
     seasonal-snapshot-detailed:
       type: object
       properties:
@@ -1107,6 +1252,124 @@ components:
       additionalProperties: false
       description: Proposes the continuous and emergency ratings for the specified Season.
       title: Seasonal Rating Proposal
+    name-type:
+      description: Type of the name being referenced.  Corresponds to the IEC CIM `NameType` concept.
+      type: string
+      maxLength: 20
+      pattern: ^[A-Za-z0-9\-]{3,20}$
+      example: EMSID
+    active-power-with-power-factor:
+      type: object
+      title: Active Power and Power Factor
+      additionalProperties: false
+      properties:
+        mw:
+          type: number
+          description: Active Power in megawatts
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+        pf:
+          type: number
+          description: Assumed power factor.
+          format: float
+          minimum: 0
+          maximum: 1
+      required:
+      - mw
+      - pf
+    resource-id:
+      type: string
+      maxLength: 500
+      pattern: ^(.){0,500}$
+      description: 'Contains a unique identifier for a power system resource, such as a
+
+        transmission facility, segment, interface, etc. This identifier is typically
+
+        used between reliability coordinators in operations.
+
+        '
+      example: urn:uuid:123e4567-e89b-12d3-a456-426614174000
+    season-name:
+      type: string
+      description: A name for the season
+      maxLength: 255
+      pattern: \w+
+    reactive-power:
+      type: object
+      title: Reactive Power
+      description: Representation of a limit in megavolt-amperes reactive (MVAR).
+      additionalProperties: false
+      properties:
+        mvar:
+          type: number
+          format: float
+          minimum: -10000
+          maximum: 10000
+      required:
+      - mvar
+    names:
+      type: object
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        alternate-identifiers:
+          type: array
+          maxItems: 10
+          minItems: 1
+          items:
+            type: object
+            properties:
+              name:
+                $ref: '#/components/schemas/local'
+              type:
+                $ref: '#/components/schemas/name-type'
+              authority:
+                $ref: '#/components/schemas/entity'
+              mrid:
+                $ref: '#/components/schemas/local'
+            required:
+            - name
+      required:
+      - resource-id
+    active-power:
+      type: object
+      title: Active Power
+      additionalProperties: false
+      properties:
+        mw:
+          type: number
+          description: Active Power in megawatts
+          format: float
+          minimum: 1
+          maximum: 10000
+        kV:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - mw
+    ordered-named-power-system-resources:
+      type: array
+      minItems: 1
+      maxItems: 50000
+      description: '
+
+        Ordered array of power system resource names. The order of these items
+
+        determines the order of the ratings proposals in the `ratings` array.
+
+        '
+      items:
+        $ref: '#/components/schemas/names'
     seasonal-proposal-considered:
       type: object
       properties:
@@ -1153,169 +1416,116 @@ components:
       title: Seasonal Rating Proposal
       description: Proposes the continuous and emergency ratings for the specified Season.
       additionalProperties: false
-    resource-id:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a unique identifier for a power system resource, such as a
-
-        transmission facility, segment, interface, etc. This identifier is typically
-
-        used between reliability coordinators in operations.
-
-        '
-      example: urn:uuid:123e4567-e89b-12d3-a456-426614174000
-    limit:
-      type: object
-      title: Limit
-      description: "\nDefines the limit. In practice most exchanges will only support one kind of\nlimit for proposals and snapshots. However, the specification supports\ndefining limits on a per resource basis as well as limit types that are not\nanticipated to be used to implement Order 881. TROLIE server implementations\nmust support at least one of these limit types and should return a well known\n`application/problem+json` response if they receive a proposal in an\nunsupported but valid limit type as defined here.\n\nWhen used as the media type parameter `limit-type`, these are nominated by\nthe following names.\n\n  * `active-power`\n  * `active-power-with-power-factor`\n  * `apparent-power`\n  * `current`\n  * `reactive-power`\n  * `overvoltage-threshold-pu`\n  * `overvoltage-threshold`\n  * `undervoltage-threshold-pu`\n  * `undervoltage-threshold`\n"
-      oneOf:
-      - $ref: '#/components/schemas/active-power'
-      - $ref: '#/components/schemas/active-power-with-power-factor'
-      - $ref: '#/components/schemas/apparent-power'
-      - $ref: '#/components/schemas/current'
-      - $ref: '#/components/schemas/reactive-power'
-      - $ref: '#/components/schemas/overvoltage-threshold-pu'
-      - $ref: '#/components/schemas/overvoltage-threshold'
-      - $ref: '#/components/schemas/undervoltage-threshold-pu'
-      - $ref: '#/components/schemas/undervoltage-threshold'
-    quality-class-current-source:
-      type: string
+    limit-value-set:
+      type: array
       description: '
 
-        This property is modeled after the Quality Class called "Current Source"
-
-        in ICCP. It is used to indicate the source of the current value of the
-
-        proposed rating. The natural mapping of this property to the kinds of ratings
-
-        or rating sources described in Order 881 is as follows.
-
-
-        | ICCP        | TROLIE            |
-
-        --------------|--------------------
-
-        | telemetered | DLR               |
-
-        | calculated  | AAR               |
-
-        | estimated   | Recourse Rating  / time-bound static rating |
-
-        | manual      | Operator Override |
+        A set of general limit or rating values, each mapped to the various limit bands defined by the Transmission Provider''s operating manual. This typically consists of a "normal" limit, as well as limits for various levels of emergency conditions (typically 2-4) defined in the operations manual.
 
         '
-      enum:
-      - Telemetered
-      - Calculated
-      - Estimated
-      - Manual
-      default: Calculated
-    day-night:
-      description: '
+      minItems: 1
+      maxItems: 10
+      items:
+        type: object
+        description: Operating Limit
+        properties:
+          duration-name:
+            description: 'A type of limit as defined in the Transmission Provider''s operating manual,
 
-        Optional label to specify if the proposed seasonal ratings schedule is meant
+              usually indicating specific scenarios under which the limit may be used as
 
-        to be used only during the day or only a night. If this field is not provided,
+              well as a maximum period for which the limit may be safely applied.
 
-        the schedule is assumed to be valid for both day and night.
-
-        '
-      type: string
-      enum:
-      - DAY
-      - NIGHT
-    current:
+              '
+            type: string
+            maxLength: 20
+            pattern: ^[A-Za-z\-]{3,10}$
+            example: emergency
+          limit:
+            $ref: '#/components/schemas/limit'
+          limiting-analysis:
+            $ref: '#/components/schemas/limiting-analysis'
+        required:
+        - duration-name
+        - limit
+    overvoltage-threshold:
       type: object
-      title: Current
-      description: Representation of a thermal limit in amperes.
+      title: Overvoltage Threshold
+      description: An upper limit to voltage for a transmission facility in kilovolts.
       additionalProperties: false
       properties:
-        amps:
+        kV-max:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - kV-max
+    undervoltage-threshold-pu:
+      type: object
+      title: Undervoltage Threshold per unit
+      description: 'An lower limit to voltage for a transmission facility in per unit with the nominal voltage assumed to be the base voltage.
+
+        '
+      additionalProperties: false
+      properties:
+        voltage-pu-min:
           type: number
           format: float
-          minimum: 1
-          maximum: 100000
+          minimum: 0
+          maximum: 2
       required:
-      - amps
-    seasonal-proposal-header:
+      - voltage-pu-min
+    problem:
+      description: See [RFC9457](https://www.rfc-editor.org/rfc/rfc9457#appendix-A).
       type: object
       properties:
-        source:
-          $ref: '#/components/schemas/data-provenance'
-        default-emergency-durations:
-          $ref: '#/components/schemas/emergency-durations'
-        default-limiting-analysis:
-          $ref: '#/components/schemas/limiting-analysis'
-        power-system-resources:
-          $ref: '#/components/schemas/named-power-system-resources'
-      additionalProperties: false
-      required:
-      - source
-      - default-emergency-durations
-      - power-system-resources
-      description: '
+        type:
+          type: string
+          format: uri-reference
+          maxLength: 2048
+          description: 'A URI reference that identifies the problem type.
 
-        Describes the contents of this seasonal ratings proposal.
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-type)
 
-        '
-    seasonal-proposals:
-      x-tags:
-      - Seasonal
-      title: Per-Resource Seasonal Ratings Schedule
-      type: object
-      additionalProperties: false
-      properties:
-        resource-id:
-          $ref: '#/components/schemas/resource-id'
-        periods:
-          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
-          type: array
-          minItems: 1
-          maxItems: 240
-          items:
-            $ref: '#/components/schemas/seasonal-proposal'
-    seasonal-ratings-snapshot-detailed:
-      type: object
-      description: A snapshot of the seasonal ratings for a monitoring set.
-      properties:
-        snapshot-header:
-          $ref: '#/components/schemas/common-header'
-        ratings:
-          type: array
-          minItems: 1
-          maxItems: 50000
-          description: Set of forecast limits
-          items:
-            $ref: '#/components/schemas/seasonal-rating-snapshot-item-detailed'
+            '
+          example: https://iana.org/assignments/http-problem-types#date
+        title:
+          type: string
+          format: free-text
+          maxLength: 500
+          description: 'A short, human-readable summary of the problem type.
+
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-title)
+
+            '
+        status:
+          type: number
+          minimum: 100
+          maximum: 599
+          description: 'The HTTP status code generated by the origin server for this occurrence of the problem.
+
+            '
+        detail:
+          type: string
+          format: free-text
+          maxLength: 500
+          description: A human-readable explanation specific to this occurrence of the problem. See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-detail)
+        instance:
+          type: string
+          format: uri-reference
+          maxLength: 2048
+          description: 'A URI reference that identifies the specific occurrence of the problem.
+
+            It may or may not yield further information if dereferenced.
+
+            See [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#name-status)
+
+            '
+          example: https://iana.org/assignments/http-problem-types#date
       required:
-      - snapshot-header
-      - ratings
-    seasonal-snapshot:
-      type: object
-      properties:
-        period-start:
-          $ref: '#/components/schemas/period-start'
-        period-end:
-          $ref: '#/components/schemas/period-start'
-        continuous-operating-limit:
-          $ref: '#/components/schemas/limit'
-        emergency-operating-limits:
-          $ref: '#/components/schemas/limit-value-set'
-        limiting-analysis:
-          $ref: '#/components/schemas/limiting-analysis'
-        season-name:
-          $ref: '#/components/schemas/season-name'
-        day-night:
-          $ref: '#/components/schemas/day-night'
-      required:
-      - period-start
-      - period-end
-      - continuous-operating-limit
-      - emergency-operating-limits
-      additionalProperties: false
-      description: Proposes the continuous and emergency ratings for the specified Season.
-      title: Seasonal Rating Proposal
+      - type
     period-start:
       description: '
 
@@ -1353,6 +1563,182 @@ components:
       format: date-time
       maxLength: 25
       example: '2025-07-12T03:00:00-05:00'
+    seasonal-schedule:
+      description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
+      type: array
+      minItems: 1
+      maxItems: 240
+      items:
+        $ref: '#/components/schemas/season'
+    seasonal-rating-snapshot-item:
+      type: object
+      additionalProperties: false
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        periods:
+          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
+          type: array
+          minItems: 1
+          maxItems: 240
+          items:
+            $ref: '#/components/schemas/seasonal-snapshot'
+    undervoltage-threshold:
+      type: object
+      title: Undervoltage Threshold
+      description: A lower limit to voltage for a transmission facility in kilovolts.
+      additionalProperties: false
+      properties:
+        kV-min:
+          description: The voltage in kilovolts.
+          type: number
+          format: int32
+          minimum: 0
+          maximum: 1100
+      required:
+      - kV-min
+    quality-class-current-source:
+      type: string
+      description: '
+
+        This property is modeled after the Quality Class called "Current Source"
+
+        in ICCP. It is used to indicate the source of the current value of the
+
+        proposed rating. The natural mapping of this property to the kinds of ratings
+
+        or rating sources described in Order 881 is as follows.
+
+
+        | ICCP        | TROLIE            |
+
+        --------------|--------------------
+
+        | telemetered | DLR               |
+
+        | calculated  | AAR               |
+
+        | estimated   | Recourse Rating  / time-bound static rating |
+
+        | manual      | Operator Override |
+
+        '
+      enum:
+      - Telemetered
+      - Calculated
+      - Estimated
+      - Manual
+      default: Calculated
+    base-header:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/data-provenance'
+        default-emergency-durations:
+          $ref: '#/components/schemas/emergency-durations'
+        default-limiting-analysis:
+          $ref: '#/components/schemas/limiting-analysis'
+      additionalProperties: false
+      required:
+      - source
+      - default-emergency-durations
+    seasonal-proposals:
+      x-tags:
+      - Seasonal
+      title: Per-Resource Seasonal Ratings Schedule
+      type: object
+      additionalProperties: false
+      properties:
+        resource-id:
+          $ref: '#/components/schemas/resource-id'
+        periods:
+          description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
+          type: array
+          minItems: 1
+          maxItems: 240
+          items:
+            $ref: '#/components/schemas/seasonal-proposal'
+    seasonal-proposal:
+      type: object
+      properties:
+        period-start:
+          $ref: '#/components/schemas/period-start'
+        period-end:
+          $ref: '#/components/schemas/period-start'
+        continuous-operating-limit:
+          $ref: '#/components/schemas/limit'
+        emergency-operating-limits:
+          $ref: '#/components/schemas/limit-value-set'
+        limiting-analysis:
+          $ref: '#/components/schemas/limiting-analysis'
+        current-source:
+          $ref: '#/components/schemas/quality-class-current-source'
+        inputs-used:
+          description: '
+
+            Optional list of quantities used as input to the ratings determination.
+
+            The particular information exchange determines which values may be expected
+
+            as well as the conventions used to represent those values. This property
+
+            is included to prescribe a way to include these inputs.
+
+            '
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/input'
+        season-name:
+          $ref: '#/components/schemas/season-name'
+        day-night:
+          $ref: '#/components/schemas/day-night'
+      required:
+      - period-start
+      - period-end
+      - continuous-operating-limit
+      - emergency-operating-limits
+      title: Seasonal Rating Proposal
+      description: Proposes the continuous and emergency ratings for the specified Season.
+      additionalProperties: false
+    seasonal-proposals-slim:
+      description: '
+
+        A proposal for the seasonal ratings for a power system object, e.g., a
+
+        segment. The proposal''s structure is determined by the contents of the
+
+        `proposal-header`. In particular, this element should have an entry corresponding
+
+        to each season in the `default-seasonal-schedule`.
+
+        '
+      type: array
+      minItems: 1
+      maxItems: 240
+      items:
+        $ref: '#/components/schemas/seasonal-proposal-slim'
+      x-tags:
+      - Seasonal
+      title: Per-Resource Seasonal Ratings Schedule (slim)
+      example:
+      - - 50
+        - 55
+        - 60
+        - 65
+      - - 70
+        - 75
+        - 80
+        - 85
+      - - 90
+        - 95
+        - 100
+        - 105
+      - - 90
+        - 95
+        - 100
+        - 105
     seasonal-ratings-proposal-slim:
       type: object
       properties:
@@ -1368,25 +1754,24 @@ components:
       required:
       - proposal-header
       - ratings
-    apparent-power:
+    named-power-system-resources:
+      type: array
+      minItems: 1
+      maxItems: 50000
+      description: Collection of power system resource names
+      items:
+        $ref: '#/components/schemas/names'
+    seasonal-ratings-snapshot-detailed-elide-psr:
       type: object
-      title: Apparent Power
-      additionalProperties: false
+      description: A snapshot of the seasonal ratings for a monitoring set.
       properties:
-        mva:
-          type: number
-          description: Representation of a limit in megavolt-amperes (MVA).
-          format: float
-          minimum: 1
-          maximum: 10000
-        kV:
-          description: The voltage in kilovolts.
-          type: number
-          format: int32
-          minimum: 0
-          maximum: 1100
+        snapshot-header:
+          $ref: '#/components/schemas/base-header'
+        ratings:
+          $ref: '#/components/schemas/ratings'
       required:
-      - mva
+      - snapshot-header
+      - ratings
     seasonal-ratings-proposal-status:
       type: object
       description: Seasonal rating proposal status
@@ -1481,74 +1866,23 @@ components:
       - source
       - incomplete-obligation-count
       - invalid-proposal-count
-    seasonal-proposals-slim:
-      description: '
-
-        A proposal for the seasonal ratings for a power system object, e.g., a
-
-        segment. The proposal''s structure is determined by the contents of the
-
-        `proposal-header`. In particular, this element should have an entry corresponding
-
-        to each season in the `default-seasonal-schedule`.
-
-        '
-      type: array
-      minItems: 1
-      maxItems: 240
-      items:
-        $ref: '#/components/schemas/seasonal-proposal-slim'
-      x-tags:
-      - Seasonal
-      title: Per-Resource Seasonal Ratings Schedule (slim)
-      example:
-      - - 50
-        - 55
-        - 60
-        - 65
-      - - 70
-        - 75
-        - 80
-        - 85
-      - - 90
-        - 95
-        - 100
-        - 105
-      - - 90
-        - 95
-        - 100
-        - 105
-    timestamp:
-      description: RFC 3339 date-time string with a maximum of 10 digits in the fractional seconds component, i.e., nanosecond precision.
-      type: string
-      format: date-time
-      maxLength: 35
-    season-name:
-      type: string
-      description: A name for the season
-      maxLength: 255
-      pattern: \w+
-    reactive-power:
+    seasonal-ratings-snapshot-detailed:
       type: object
-      title: Reactive Power
-      description: Representation of a limit in megavolt-amperes reactive (MVAR).
-      additionalProperties: false
+      description: A snapshot of the seasonal ratings for a monitoring set.
       properties:
-        mvar:
-          type: number
-          format: float
-          minimum: -10000
-          maximum: 10000
+        snapshot-header:
+          $ref: '#/components/schemas/common-header'
+        ratings:
+          type: array
+          minItems: 1
+          maxItems: 50000
+          description: Set of forecast limits
+          items:
+            $ref: '#/components/schemas/seasonal-rating-snapshot-item-detailed'
       required:
-      - mvar
-    seasonal-schedule:
-      description: "\nDefines the seasonal ratings schedule adopted in this proposal. Each season\nis given a `season-name` with the beginning of the season starting on\n`begins` and ending on the `begins` of the next season chronologically. \n\nIt is required that the seasons are listed chronologically.\n"
-      type: array
-      minItems: 1
-      maxItems: 240
-      items:
-        $ref: '#/components/schemas/season'
-    common-header:
+      - snapshot-header
+      - ratings
+    seasonal-proposal-header:
       type: object
       properties:
         source:
@@ -1564,179 +1898,11 @@ components:
       - source
       - default-emergency-durations
       - power-system-resources
-    seasonal-proposal-header-slim:
-      type: object
-      properties:
-        source:
-          $ref: '#/components/schemas/data-provenance'
-        default-emergency-durations:
-          $ref: '#/components/schemas/emergency-durations'
-        default-limiting-analysis:
-          $ref: '#/components/schemas/limiting-analysis'
-        power-system-resources:
-          $ref: '#/components/schemas/ordered-named-power-system-resources'
-        default-seasonal-schedule:
-          description: '
-
-            Defines the seasonal schedule that is used in the proposal.  Each season
-
-            is defined in the `schedule` array and the `ends` property defines the
-
-            end of the last season.  Each individual facility proposal must have
-
-            corresponding entry for each entry In the `schedule` array.
-
-            '
-          properties:
-            schedule:
-              $ref: '#/components/schemas/seasonal-schedule'
-            ends:
-              $ref: '#/components/schemas/period-start'
-            day-night:
-              $ref: '#/components/schemas/day-night'
-          required:
-          - schedule
-          - ends
-      additionalProperties: false
-      required:
-      - source
-      - default-emergency-durations
-      - power-system-resources
-      - default-seasonal-schedule
       description: '
 
-        Describes the contents of the seasonal proposal. In particular, the
-
-        structure of the `ratings` is determined by the details provided in this
-
-        header.
+        Describes the contents of this seasonal ratings proposal.
 
         '
-    overvoltage-threshold:
-      type: object
-      title: Overvoltage Threshold
-      description: An upper limit to voltage for a transmission facility in kilovolts.
-      additionalProperties: false
-      properties:
-        kV-max:
-          description: The voltage in kilovolts.
-          type: number
-          format: int32
-          minimum: 0
-          maximum: 1100
-      required:
-      - kV-max
-    names:
-      type: object
-      properties:
-        resource-id:
-          $ref: '#/components/schemas/resource-id'
-        alternate-identifiers:
-          type: array
-          maxItems: 10
-          minItems: 1
-          items:
-            type: object
-            properties:
-              name:
-                $ref: '#/components/schemas/local'
-              type:
-                $ref: '#/components/schemas/name-type'
-              authority:
-                $ref: '#/components/schemas/entity'
-              mrid:
-                $ref: '#/components/schemas/local'
-            required:
-            - name
-      required:
-      - resource-id
-    seasonal-ratings-proposal:
-      type: object
-      properties:
-        proposal-header:
-          $ref: '#/components/schemas/seasonal-proposal-header'
-        ratings:
-          type: array
-          minItems: 1
-          maxItems: 50000
-          description: Seasonal Ratings proposals
-          items:
-            $ref: '#/components/schemas/seasonal-proposals'
-      required:
-      - proposal-header
-      - ratings
-    seasonal-proposal:
-      type: object
-      properties:
-        period-start:
-          $ref: '#/components/schemas/period-start'
-        period-end:
-          $ref: '#/components/schemas/period-start'
-        continuous-operating-limit:
-          $ref: '#/components/schemas/limit'
-        emergency-operating-limits:
-          $ref: '#/components/schemas/limit-value-set'
-        limiting-analysis:
-          $ref: '#/components/schemas/limiting-analysis'
-        current-source:
-          $ref: '#/components/schemas/quality-class-current-source'
-        inputs-used:
-          description: '
-
-            Optional list of quantities used as input to the ratings determination.
-
-            The particular information exchange determines which values may be expected
-
-            as well as the conventions used to represent those values. This property
-
-            is included to prescribe a way to include these inputs.
-
-            '
-          type: array
-          minItems: 1
-          maxItems: 50
-          items:
-            $ref: '#/components/schemas/input'
-        season-name:
-          $ref: '#/components/schemas/season-name'
-        day-night:
-          $ref: '#/components/schemas/day-night'
-      required:
-      - period-start
-      - period-end
-      - continuous-operating-limit
-      - emergency-operating-limits
-      title: Seasonal Rating Proposal
-      description: Proposes the continuous and emergency ratings for the specified Season.
-      additionalProperties: false
-    seasonal-ratings-snapshot:
-      type: object
-      description: A snapshot of the seasonal ratings for a monitoring set.
-      properties:
-        snapshot-header:
-          $ref: '#/components/schemas/common-header'
-        ratings:
-          type: array
-          minItems: 1
-          maxItems: 50000
-          description: Set of forecast limits
-          items:
-            $ref: '#/components/schemas/seasonal-rating-snapshot-item'
-      required:
-      - snapshot-header
-      - ratings
-    entity:
-      type: string
-      maxLength: 500
-      pattern: ^(.){0,500}$
-      description: 'Contains a unique identifier for an entity, such as a grid operator or
-
-        organization. This identifier is typically used in the context of data
-
-        exchange between entities.
-
-        '
-      example: org:naesb:weq:eir:MISO
     season:
       type: object
       properties:
@@ -1747,193 +1913,6 @@ components:
       required:
       - season-name
       - begins
-  responses:
-    403-empty:
-      description: Access denied
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    '304':
-      description: Not Modified.
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-    400-problem:
-      description: Malformed request
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-    429-empty:
-      description: Too many requests (rate limiting)
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-        Retry-After:
-          $ref: '#/components/headers/Retry-After'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    415-problem:
-      description: Unsupported media type
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-        Accept:
-          schema:
-            type: string
-            pattern: ^((application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))(\,\s*(application\/vnd\.trolie\.(?:[a-z-]+)\.v\d+\+json(;q=(0\.\d+|1\.0))?))*$
-            maxLength: 500
-          examples:
-            Forecast Proposal:
-              summary: Used to update the area-wide forecast
-              value: application/vnd.trolie.rating-forecast-proposal.v1+json
-            Real-Time Proposal:
-              summary: Used to update the area-wide nowcast
-              value: application/vnd.trolie.rating-realtime-proposal.v1+json
-        Accept-Encoding:
-          description: 'The server must support and prefer Brotli yet must accept gzip for
-
-            compatibility.
-
-            '
-          schema:
-            type: string
-            enum:
-            - br,gzip
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-    500-empty:
-      description: An unexpected error occurred
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    '406':
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-        ETag:
-          $ref: '#/components/headers/ETag'
-      description: Not Acceptable (Content negotiation failed)
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-          examples:
-            Compression Required:
-              summary: Only compressed responses are supported
-              value:
-                type: //trolie.example.com/spec/client-errors/406/compression-required
-                title: 'Not Acceptable: Accept-Encoding Required'
-                status: 406
-                detail: 'This resource must be compressed with one of the following algorithms: gzip, deflate, br.'
-    404-empty:
-      description: Not Found
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    406-problem:
-      description: Not Acceptable (Content negotiation failed)
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
-    401-empty:
-      description: Unauthorized
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    413-empty:
-      description: Payload too large
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/*:
-          schema:
-            $ref: '#/components/schemas/empty'
-    422-problem:
-      description: Unprocessable content
-      headers:
-        X-Rate-Limit-Limit:
-          $ref: '#/components/headers/X-Rate-Limit-Limit'
-        X-Rate-Limit-Remaining:
-          $ref: '#/components/headers/X-Rate-Limit-Remaining'
-        X-Rate-Limit-Reset:
-          $ref: '#/components/headers/X-Rate-Limit-Reset'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/problem'
   headers:
     ETag:
       description: 'An opaque, unique identifier--typically a hash value--for a specific version of a resource. The modeled resource state is what is versioned, not the content of any particular representation. The server MUST use a strong validator so that the same ETag is returned regardless of the media type of the representation.
@@ -1944,6 +1923,20 @@ components:
         format: hash
         maxLength: 256
         additionalProperties: false
+    X-Rate-Limit-Remaining:
+      description: The number of remaining requests in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
+    X-Rate-Limit-Reset:
+      description: The number of seconds left in the current period
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000
     X-Rate-Limit-Limit:
       description: The number of allowed requests in the current period
       schema:
@@ -1959,20 +1952,6 @@ components:
         maximum: 60
         example: 60
         description: The seconds to delay after the response is received.
-    X-Rate-Limit-Reset:
-      description: The number of seconds left in the current period
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 1000
-    X-Rate-Limit-Remaining:
-      description: The number of remaining requests in the current period
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 1000
   parameters:
     query-filter:
       name: monitoring-set
