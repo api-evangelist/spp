@@ -349,6 +349,8 @@ apis:
   humanURL: https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf
   baseURL: ftp://pubftp.spp.org
   tags:
+  - Real-Time
+  tags_raw:
   - Realtime
   properties:
   - type: OpenAPI
