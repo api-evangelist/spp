@@ -1,4 +1,4 @@
-# Southwest Power Pool (spp)
+# Southwest Power Pool
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,159 +66,134 @@
 
 Southwest Power Pool (SPP) is a nonprofit Regional Transmission Organization regulated by the Federal Energy Regulatory Commission and headquartered in Little Rock, Arkansas. Founded in 1941 and approved as an RTO in 2004, SPP operates the Integrated Marketplace day-ahead and real-time balancing markets, the Western Energy Imbalance Service (WEIS) market, Western Reliability Coordination services, and is building the Markets+ day-ahead market for the West with a targeted 2027 go-live. SPP sits at the wholesale layer of the United States energy value chain: it dispatches generation, prices congestion, plans transmission, and settles the market for its member utilities — it has no retail customers, so no consumer energy-data mandate such as Green Button applies to it. Its API posture is a clean split. Market and grid data is genuinely open: locational marginal prices, market clearing prices, operating reserves, load, generation mix, VER curtailments and outage capacity are served anonymously as CSV from the SPP Portal file browser and from an anonymous public FTP site, with an Esri ArcGIS REST price-contour service alongside — no account, no key, no licence click-through. Everything a market participant actually transacts against is the opposite: the Integrated Marketplace SOAP web services, the Settlement Management System API, and the FERC Order 881 LEP/TROLIE ratings API are member-only, require an OATI webCARES x.509 digital certificate plus an SPP UAA role, and SPP publishes no base URL and no OpenAPI for them.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/spp/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/spp/refs/heads/main/apis.yml)
+**Areas:** Energy · United States · Energy Markets · Electricity · Grid · Utilities · Renewables · Market Data · Transmission · System Operator
 
-## Tags
+## Southwest Power Pool on APIs.io
 
-- Energy
-- United States
-- Energy Markets
-- Electricity
-- Grid
-- Utilities
-- Renewables
-- Market Data
-- Transmission
-- System Operator
+Everything profiled for Southwest Power Pool is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/spp/](https://apis.io/providers/spp/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (11)
 
-- **Created:** 2026-07-27
-- **Modified:** 2026-07-27
+- [SPP Public Data FTP](https://apis.io/apis/spp/spp-public-data-ftp/) — SPP's officially documented programmatic interface to its public data. The SPP Public Data Access guide (v3.0, July 2023) names FTP as the programmatic…
+- [SPP Portal Public Data File Browser API](https://apis.io/apis/spp/spp-portal-file-browser-api/) — The HTTP download service behind the SPP Portal public data pages. Anonymous GET requests of the form /file-browser-api/download/{dataset}?path={file}…
+- [SPP Portal Chart API](https://apis.io/apis/spp/spp-portal-chart-api/) — JSON and CSV chart feeds serving the SPP Portal dashboards. Confirmed anonymously on 2026-07-27: /chart-api/gen-mix/asChart and…
+- [SPP Price Contour Map ArcGIS REST Services](https://apis.io/apis/spp/spp-price-contour-map-arcgis/) — An Esri ArcGIS Server REST directory serving the geospatial layers behind SPP's price contour map. Confirmed anonymously on 2026-07-27 at ArcGIS 11.5: the…
+- [SPP Integrated Marketplace Markets Web Service](https://apis.io/apis/spp/spp-integrated-marketplace-web-services/) — The SOAP web and notification services market participants use to submit offers and bids and retrieve results from the SPP Integrated Marketplace, with WEIS…
+- [Southwest Power Pool Forecasting API](https://apis.io/apis/spp/spp-forecasting-api/) — The Forecasting API operations define the exchange of forecasted ratings, including the 240-hour-ahead forecasted AAR data exchange required by FERC Order…
+- [Southwest Power Pool Monitoring Sets API](https://apis.io/apis/spp/spp-monitoring-sets-api/) — [Monitoring Sets](https://trolie.energy/concepts#monitoring-sets) are named sets of power system resources that may be used to filter ratings and limits…
+- [Southwest Power Pool Seasonal API](https://apis.io/apis/spp/spp-seasonal-api/) — Seasonal ratings are static ratings associated with extended durations, typically months. These are typically used in both planning and operations. Power…
+- [Southwest Power Pool Seasonal Overrides API](https://apis.io/apis/spp/spp-seasonal-overrides-api/) — A Seasonal Override instructs the system to use a temporary static rating instead of any concurrent Seasonal Rating for a resource. A typical use case is a…
+- [Southwest Power Pool Temporary AAR Exceptions API](https://apis.io/apis/spp/spp-temporary-aar-exceptions-api/) — A [Temporary AAR Exception](https://trolie.energy/concepts#temporary-aar-exception) is provided by the Ratings Provider when a Ratings Obligation cannot be…
+- [Southwest Power Pool Realtime API](https://apis.io/apis/spp/spp-realtime-api/) — If permitted by the Clearinghouse Provider, its Ratings Providers can use these functions to exchange real-time ratings, supplementing or replacing…
 
-## APIs
+### Published properties
 
-### SPP Public Data FTP
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-SPP's officially documented programmatic interface to its public data. The SPP Public Data Access guide (v3.0, July 2023) names FTP as the programmatic access path for Integrated Marketplace, Western Reliability Coordination and WEIS public data. Verified anonymously on 2026-07-27: a listing returned FTP status 226 with top-level directories including Markets, Operational_Data, Operations_Reports, Settlements, Reliability, TCR, Market_Monitoring and West_EIS. No account, key or licence agreement is required.
+#### Examples (3)
 
-- **Human URL:** [https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf](https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf)
-- **Base URL:** `ftp://pubftp.spp.org`
+Example requests and responses.
 
-#### Tags
+- [Spp Arcgis Rest Info](https://apis.io/examples/spp/spp-arcgis-rest-info/)
+- [Spp Arcgis Rtbm Lmp Mapserver](https://apis.io/examples/spp/spp-arcgis-rtbm-lmp-mapserver/)
+- [Spp Chart Api Gen Mix](https://apis.io/examples/spp/spp-chart-api-gen-mix/)
 
-- Public Data
-- Market Data
-- FTP
+#### Collections (1)
 
-#### Properties
+Postman and Open Collection request collections.
 
-- [Documentation](https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf)
-- [Documentation](https://www.spp.org/stakeholder-center/user-guides-apis-integrations/)
+- [Transmission Ratings and Operating Limits Information Exchange (TROLIE)](https://apis.io/collections/spp/open-trolie-standard/)
 
-### SPP Portal Public Data File Browser API
+#### Overlays (1)
 
-The HTTP download service behind the SPP Portal public data pages. Anonymous GET requests of the form `/file-browser-api/download/{dataset}?path={file}` return CSV for real-time balancing market LMP by settlement location, real-time and day-ahead market clearing prices, operating reserves, hourly load, historical generation mix, VER curtailments, capacity of generation on outage, and the WEIS market equivalents. Eight dataset paths were confirmed HTTP 200 with content-type `text/csv` on 2026-07-27 with no credentials. SPP documents the datasets and file formats in its Markets Public Data Guide but does not publish this HTTP path as a supported interface specification — FTP is the interface SPP formally supports.
+OpenAPI overlays, including conversational phrasing for each operation.
 
-- **Human URL:** [https://portal.spp.org/pages/rtbm-lmp-by-location](https://portal.spp.org/pages/rtbm-lmp-by-location)
-- **Base URL:** `https://portal.spp.org/file-browser-api/download`
+- [Spp Trolie Standard Overlay](https://apis.io/overlays/spp/spp-trolie-standard-overlay/)
 
-#### Tags
+#### Security (2)
 
-- Public Data
-- Market Data
-- LMP
-- Load
-- Generation Mix
+Authentication, trust centre, and vulnerability disclosure.
 
-#### Properties
+- [Spp Authentication](https://apis.io/security/spp/spp-authentication/)
+- [Spp Domain Security](https://apis.io/security/spp/spp-domain-security/)
 
-- [Documentation](https://portal.spp.org/pages/rtbm-lmp-by-location)
-- [Documentation](https://www.spp.org/documents/19541/spp%20markets%20public%20data%20guide.pdf)
+#### OAuth scopes (1)
 
-### SPP Portal Chart API
+The permissions the API asks for.
 
-JSON and CSV chart feeds serving the SPP Portal dashboards. Confirmed anonymously on 2026-07-27: `/chart-api/gen-mix/asChart` and `/chart-api/load-forecast/asChart` return `application/json` with labelled hourly datasets by fuel type and load forecast series, and `/chart-api/gen-mix-365/asFile` returns a rolling 365-day generation mix CSV. Undocumented as a formal interface specification; served without authentication.
+- [Spp Scopes](https://apis.io/scopes/spp/spp-scopes/)
 
-- **Human URL:** [https://portal.spp.org/pages/generation-mix-historical](https://portal.spp.org/pages/generation-mix-historical)
-- **Base URL:** `https://portal.spp.org/chart-api`
+#### Rate limits (1)
 
-#### Tags
+Published request limits.
 
-- Public Data
-- Generation Mix
-- Load Forecast
+- [Spp Rate Limits](https://apis.io/rate-limits/spp/spp-rate-limits/)
 
-#### Properties
+## Where to find this API
 
-- [Documentation](https://portal.spp.org/pages/generation-mix-historical)
-
-### SPP Price Contour Map ArcGIS REST Services
-
-An Esri ArcGIS Server REST directory serving the geospatial layers behind SPP's price contour map. Confirmed anonymously on 2026-07-27 at ArcGIS 11.5: the service root returned JSON listing the PCM and Utilities folders, and the PCM folder listed DA_Features, DA_LMP, DELTA_Features, DELTA_LMP, RTBM_Features, RTBM_LMP, States and Transmission MapServer services. Follows the standard Esri ArcGIS REST API contract (`?f=json`), not an SPP-authored specification.
-
-- **Human URL:** [https://pricecontourmap.spp.org/arcgis/rest/services](https://pricecontourmap.spp.org/arcgis/rest/services)
-- **Base URL:** `https://pricecontourmap.spp.org/arcgis/rest/services`
-
-#### Tags
-
-- Geospatial
-- Market Data
-- LMP
-- ArcGIS
-
-#### Properties
-
-- [API Reference](https://pricecontourmap.spp.org/arcgis/rest/services?f=json)
-
-### SPP LEP/TROLIE Ratings API
-
-SPP's REST implementation of GE Vernova's Limit Exchange Portal (LEP) using the LF Energy TROLIE (Transmission Ratings and Operating Limits Information Exchange) API specification, built to meet FERC Order 881 ambient-adjusted ratings obligations. SPP published a versioned Data Exchange Guide (v1.0, 8 Nov 2024) covering monitoring sets, forecast ratings, real-time ratings and seasonal ratings. No production base URL is published — SPP's own guide uses the placeholder `https://<baseURL>/` throughout — and access requires an x.509 digital certificate from a CA SPP trusts plus a role assigned in SPP UAA. Not verifiable anonymously.
-
-- **Human URL:** [https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf](https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf)
-
-#### Tags
-
-- Transmission
-- Ratings
-- TROLIE
-- FERC Order 881
-- Gated
-
-#### Properties
-
-- [Documentation](https://www.spp.org/documents/72496/spp%20lep%20api%20data%20exchange%20guide.pdf)
-- [OpenAPI](openapi/trolie-standard-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html) — the LF Energy TROLIE community specification that SPP's LEP API implements. Published by trolie.energy, **not** by SPP.
-- [Specification](https://trolie.energy/spec)
-
-### SPP Integrated Marketplace Markets Web Service
-
-The SOAP web and notification services market participants use to submit offers and bids and retrieve results from the SPP Integrated Marketplace, with WEIS Markets Web Service as the western equivalent and the Settlement Management System API for settlements. SPP's System Interfaces Stakeholder Reference Guide (v1.0, 29 Jan 2025) names these as SOAP and REST services over HTTPS requiring two-factor authentication; the Markets+ platform is stated to move to RESTful APIs. WSDLs, XSDs and endpoint URLs are published only inside the member-facing Change User Forum technical reference documents and were not retrievable anonymously; no base URL is public.
-
-- **Human URL:** [https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf](https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf)
-
-#### Tags
-
-- SOAP
-- Wholesale Markets
-- Settlements
-- Gated
-
-#### Properties
-
-- [Documentation](https://www.spp.org/documents/73131/spp%20system%20interfaces%20stakeholder%20reference%20guide%2020250129.pdf)
-- [Documentation](https://www.spp.org/stakeholder-center/user-guides-apis-integrations/)
-- [Documentation](https://www.spp.org/documents/18307/digital%20certificates%20and%20the%20integrated%20marketplace%20doc_final.pdf)
-
-## Common Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.spp.org/)
-- [Portal](https://portal.spp.org/)
 - [Documentation](https://www.spp.org/stakeholder-center/user-guides-apis-integrations/)
-- [Terms of Service](https://portal.spp.org/terms-of-use)
+- [Getting started](https://spp.org/documents/28853/spp%20public%20data%20access%2020230707.pdf)
+- [Sign up](https://www.spp.org/account/create-account/)
 - [Support](https://rms.spp.org/)
 - [Blog](https://www.spp.org/newsroom/)
-- [LinkedIn](https://www.linkedin.com/company/southwest-power-pool)
+- [Compliance](https://www.spp.org/stakeholder-center/spp-rto-compliance/)
+- [Terms of service](https://www.spp.org/terms-conditions/)
+- [Privacy policy](https://www.spp.org/terms-conditions/)
 
-## Mandate and Access Posture
+## API Evangelist rating
 
-- **Mandate regime:** Other — FERC Order 881 (ambient-adjusted transmission ratings exchange). No consumer energy-data right applies; Green Button/ESPI is a retail-utility standard and SPP has no retail customers.
-- **Mandate status:** Live claimed, unverified. SPP published a real versioned LEP/TROLIE data exchange guide, but no production base URL is public and the surface requires a digital certificate plus a UAA role, so no live conformant endpoint could be observed.
-- **Data standard:** LF Energy TROLIE (OpenAPI 3.0.3, spec 1.1.0) for ratings; ICCP and PMU streaming for telemetry; proprietary SOAP WSDL/XSD for market and settlement services; no standard reference found for the public CSV market data.
-- **Consumer data API:** No — none exists and none should.
-- **Market data open:** Yes — anonymous, no key, verified by direct probe.
-- **Access gate:** Self-serve for public data (nothing to sign up for); partner-only/membership for participant APIs (OATI webCARES x.509 certificate + SPP UAA roles + an RMS ticket).
+**Kin Score 45.2** — developing · rubric 0.25.0 · scored 2026-10-23
 
-## Maintainers
+| Facet | Score |
+|---|---|
+| Discoverability | 57.1 |
+| Contract quality | 56.9 |
+| Contract governance | 4.5 |
+| Operational transparency | 5.3 |
+| Developer ergonomics | 62.5 |
+| Access clarity | 42.1 |
 
-- Kin Lane — kin@apievangelist.com
+**Agent readiness 43.0** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | verified |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 38.5** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/spp/](https://apis.io/providers/spp/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Southwest Power Pool: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/spp/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
